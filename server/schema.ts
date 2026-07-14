@@ -1,5 +1,4 @@
 import z from 'zod'
-
 import { cleanSchemas } from '@lifeforge/server-utils'
 
 export const schemas = {
@@ -109,9 +108,7 @@ export const schemas = {
           type: 'bool'
         }
       ],
-      indexes: [
-        'CREATE UNIQUE INDEX `idx_pLEjolJLL4` ON `idea_box__containers` (`name`)'
-      ],
+      indexes: [],
       system: false
     }
   },
@@ -409,9 +406,7 @@ export const schemas = {
           type: 'relation'
         }
       ],
-      indexes: [
-        'CREATE UNIQUE INDEX `idx_VY136WXYHm` ON `idea_box_tags` (\n  `name`,\n  `container`\n)'
-      ],
+      indexes: [],
       system: false
     }
   },

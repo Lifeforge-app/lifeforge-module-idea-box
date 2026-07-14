@@ -63,7 +63,7 @@ function IdeaBox() {
         onChange={setSearchQuery}
       />
       <WithQueryData
-        controller={forgeAPI.containers.list.input({
+        contract={forgeAPI.containers.list.input({
           hidden: showhidden.toString()
         })}
       >
