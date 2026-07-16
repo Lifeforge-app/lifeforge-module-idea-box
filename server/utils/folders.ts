@@ -1,4 +1,4 @@
-import type { IPBService } from '@lifeforge/server-utils'
+import type { IPBService } from '@lifeforge/pocketbase'
 
 import type schema from '../schema'
 
