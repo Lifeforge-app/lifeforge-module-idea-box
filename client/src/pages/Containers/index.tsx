@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 import { useModuleTranslation } from '@lifeforge/localization'
 import {
   Button,
+  ContextMenu,
   ContextMenuItem,
   EmptyStateScreen,
   FAB,
@@ -32,29 +33,27 @@ function IdeaBox() {
   return (
     <>
       <ModuleHeader
-        actionButton={
-          <Button
-            className="ml-4 hidden md:flex"
-            icon="tabler:plus"
-            tProps={{
-              item: t('items.container')
-            }}
-            onClick={handleCreateContainer}
-          >
-            new
-          </Button>
-        }
-        contextMenuProps={{
-          children: (
-            <>
+        trailing={
+          <>
+            <Button
+              className="ml-4 hidden md:flex"
+              icon="tabler:plus"
+              tProps={{
+                item: t('items.container')
+              }}
+              onClick={handleCreateContainer}
+            >
+              new
+            </Button>
+            <ContextMenu>
               <ContextMenuItem
                 icon="tabler:eye-off"
                 label={showhidden ? 'Hide Hidden' : 'Show Hidden'}
                 onClick={() => setShowhidden(prev => !prev)}
               />
-            </>
-          )
-        }}
+            </ContextMenu>
+          </>
+        }
       />
       <SearchInput
         debounceMs={300}
