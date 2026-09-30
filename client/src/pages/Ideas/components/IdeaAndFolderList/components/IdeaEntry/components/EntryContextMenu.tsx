@@ -132,7 +132,9 @@ function EntryContextMenu({ entry }: { entry: IdeaBoxIdea }) {
   }, [entry, id, path, viewArchived, searchQuery, selectedTags])
 
   return (
-    <ContextMenu classNames={{ button: 'w-10 h-10' }}>
+    <ContextMenu
+      componentProps={{ button: { height: '2.5rem', width: '2.5rem' } }}
+    >
       {!entry.archived && (
         <ContextMenuItem
           icon={entry.pinned ? 'tabler:pinned-off' : 'tabler:pin'}

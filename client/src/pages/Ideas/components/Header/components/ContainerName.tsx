@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { Link } from 'react-router'
 
 import { useModuleTranslation } from '@lifeforge/localization'
-import { Icon } from '@lifeforge/ui'
+import { Box, Flex, Icon } from '@lifeforge/ui'
 
 import { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 
@@ -26,28 +26,22 @@ function ContainerName({
   }, [])
 
   return (
-    <Link
-      className="flex items-center gap-3"
-      to={`/idea-box/${id}`}
-      onClick={handleNavigateToRoot}
-    >
-      <div
-        className="rounded-lg border-2 p-3"
-        style={{
-          backgroundColor: color + '20',
-          borderColor: color
-        }}
-      >
-        <Icon
-          className="text-2xl sm:text-3xl"
-          icon={icon}
+    <Flex asChild align="center" gap="lg">
+      <Link to={`/idea-box/${id}`} onClick={handleNavigateToRoot}>
+        <Box
+          p="md"
+          r="lg"
           style={{
-            color: color
+            backgroundColor: color + '20',
+            borderColor: color,
+            borderWidth: '2px'
           }}
-        />
-      </div>
-      {viewArchived ? t('archivedIdeaIn', { container: name }) : ''}
-    </Link>
+        >
+          <Icon icon={icon} size={{ base: '1.5rem' }} style={{ color }} />
+        </Box>
+        {viewArchived ? t('archivedIdeaIn', { container: name }) : name}
+      </Link>
+    </Flex>
   )
 }
 

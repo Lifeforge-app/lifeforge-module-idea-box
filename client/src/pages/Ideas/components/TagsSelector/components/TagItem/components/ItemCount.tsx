@@ -1,6 +1,7 @@
-import clsx from 'clsx'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import tinycolor from 'tinycolor2'
+
+import { Text, colorWithOpacity } from '@lifeforge/ui'
 
 function ItemCount({
   tagColor,
@@ -11,24 +12,27 @@ function ItemCount({
   tagCount: number
   isSelected: boolean
 }) {
-  const tagCountColor = useMemo(() => {
-    if (!isSelected) {
-      return 'text-bg-500'
-    }
-
-    if (tagColor === '') {
-      return 'bg-custom-500/30 text-custom-500'
-    }
-
-    return tinycolor(tagColor).isLight() ? 'text-bg-800' : 'text-bg-100'
-  }, [isSelected, tagColor])
-
   return (
-    <span
-      className={clsx('ml-[5px] text-xs group-hover:hidden', tagCountColor)}
+    <Text
+      bg={
+        isSelected && tagColor === ''
+          ? colorWithOpacity('primary', '30%')
+          : undefined
+      }
+      color={
+        !isSelected
+          ? 'muted'
+          : tagColor === ''
+            ? 'primary'
+            : tinycolor(tagColor).isLight()
+              ? 'bg-800'
+              : 'bg-100'
+      }
+      size="xs"
+      style={{ marginLeft: '5px' }}
     >
       {tagCount}
-    </span>
+    </Text>
   )
 }
 

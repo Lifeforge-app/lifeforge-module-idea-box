@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useParams } from 'react-router'
 
-import { useModalStore } from '@lifeforge/ui'
+import { Flex, useModalStore } from '@lifeforge/ui'
 
 import { type IdeaBoxTag, useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 
@@ -94,7 +94,7 @@ function TagsSelector() {
 
   return !viewArchived ? (
     tags.length > 0 && (
-      <div className="mt-4 flex flex-wrap gap-1.5">
+      <Flex gap="xs" mt="md" wrap="wrap">
         {tags.map(tag => {
           const tagCount =
             path === '' && searchQuery.trim().length === 0
@@ -115,7 +115,7 @@ function TagsSelector() {
             />
           )
         })}
-      </div>
+      </Flex>
     )
   ) : (
     <></>

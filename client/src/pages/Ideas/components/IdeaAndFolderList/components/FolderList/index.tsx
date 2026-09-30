@@ -1,5 +1,5 @@
 import { useModuleTranslation } from '@lifeforge/localization'
-import { Icon, WithQuery } from '@lifeforge/ui'
+import { Flex, Grid, Icon, Text, WithQuery } from '@lifeforge/ui'
 
 import { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 
@@ -11,17 +11,19 @@ function FolderList() {
 
   return (
     <>
-      <h2 className="text-bg-500 mb-2 flex items-center gap-2 text-lg font-medium">
-        <Icon className="size-6" icon="tabler:folder" />
-        {t('entryType.folder')}
-      </h2>
+      <Flex as="h2" align="center" gap="sm" mb="sm">
+        <Icon color="muted" icon="tabler:folder" size="1.5rem" />
+        <Text color="muted" size="lg" weight="medium">
+          {t('entryType.folder')}
+        </Text>
+      </Flex>
       <WithQuery query={foldersQuery}>
         {folders => (
-          <div className="mt-2 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+          <Grid gap="sm" mt="sm" templateCols={{ base: 1, md: 2, lg: 3 }}>
             {folders.map(folder => (
               <FolderItem key={folder.id} folder={folder} />
             ))}
-          </div>
+          </Grid>
         )}
       </WithQuery>
     </>

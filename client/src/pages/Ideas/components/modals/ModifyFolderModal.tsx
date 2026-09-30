@@ -1,11 +1,30 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
+import z from 'zod'
 
-import type { InferInput } from '@lifeforge/api'
-import { FormModal, defineForm, toast } from '@lifeforge/ui'
+import {
+  ColorField,
+  FormModal,
+  IconField,
+  TextField,
+  createDefaultValues,
+  toast
+} from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
 import type { IdeaBoxFolder } from '@/providers/IdeaBoxProvider'
+
+const schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  icon: z.string().min(1, 'Icon is required'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'),
+  container: z.string(),
+  parent: z.string()
+})
 
 function ModifyFolderModal({
   data: { type, initialData },
@@ -38,65 +57,58 @@ function ModifyFolderModal({
     })
   )
 
-  const { formProps } = defineForm<
-    InferInput<(typeof forgeAPI.folders)[typeof type]>['body']
-  >({
-    icon: {
-      create: 'tabler:plus',
-      update: 'tabler:pencil'
-    }[type],
-    namespace: 'apps.ideaBox',
-    title: `folder.${type}`,
-    onClose,
-    submitButton: type
+  const form = useForm({
+    defaultValues: {
+      ...createDefaultValues(schema),
+      name: initialData?.name || '',
+      icon: initialData?.icon || '',
+      color: initialData?.color || ''
+    },
+    resolver: zodResolver(schema)
   })
-    .typesMap({
-      container: 'text',
-      parent: 'text',
-      name: 'text',
-      icon: 'icon',
-      color: 'color'
-    })
-    .setupFields({
-      name: {
-        required: true,
-        label: 'Folder name',
-        icon: 'tabler:folder',
-        placeholder: 'My Folder',
-        type: 'text'
-      },
-      icon: {
-        required: true,
-        label: 'Folder icon',
-        type: 'icon'
-      },
-      color: {
-        required: true,
-        label: 'Folder color',
-        type: 'color'
-      }
-    })
-    .initialData(
-      initialData
-        ? {
-            name: initialData.name,
-            icon: initialData.icon,
-            color: initialData.color
-          }
-        : {
-            name: '',
-            icon: '',
-            color: ''
-          }
-    )
-    .onSubmit(async data => {
-      data.container = id!
-      data.parent = path?.split('/').pop() || ''
-      await mutation.mutateAsync(data)
-    })
-    .build()
 
-  return <FormModal {...formProps} />
+  return (
+    <FormModal
+      form={form}
+      submissionConfig={{
+        template: type,
+        handler: async formData => {
+          await mutation.mutateAsync({
+            ...formData,
+            container: id!,
+            parent: path?.split('/').pop() || ''
+          })
+        }
+      }}
+      uiConfig={{
+        icon: type === 'create' ? 'tabler:plus' : 'tabler:pencil',
+        title: `folder.${type}`,
+        namespace: 'apps.ideaBox',
+        onClose
+      }}
+    >
+      <TextField
+        required
+        control={form.control}
+        icon="tabler:folder"
+        label="folderName"
+        name="name"
+        placeholder="My Folder"
+      />
+      <IconField
+        required
+        control={form.control}
+        label="folderIcon"
+        name="icon"
+      />
+      <ColorField
+        required
+        control={form.control}
+        label="folderColor"
+        name="color"
+      />
+    </FormModal>
+  )
 }
 
 export default ModifyFolderModal

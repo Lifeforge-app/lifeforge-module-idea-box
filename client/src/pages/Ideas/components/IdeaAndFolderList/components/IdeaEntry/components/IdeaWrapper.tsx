@@ -1,10 +1,9 @@
-import clsx from 'clsx'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useDrag } from 'react-dnd'
 
 import { useModuleTranslation } from '@lifeforge/localization'
-import { Card, Icon } from '@lifeforge/ui'
+import { Box, Card, Flex, Icon, Stack, Text } from '@lifeforge/ui'
 
 import type { IdeaBoxIdea } from '@/providers/IdeaBoxProvider'
 
@@ -47,26 +46,36 @@ function IdeaWrapper({
       }}
       isInteractive
       as="button"
-      className={clsx(
-        'group my-4 flex w-full! cursor-pointer items-start justify-between gap-2 text-left',
-        isDragging && 'cursor-move'
-      )}
+      align="start"
+      gap="sm"
+      justify="between"
+      my="md"
       style={{
-        opacity
+        ...(isDragging ? { cursor: 'move' } : {}),
+        opacity,
+        textAlign: 'left'
       }}
+      width="100%"
       onClick={onClick}
     >
       {entry.pinned && (
-        <Icon
-          className="absolute -top-2 -left-2 z-50 size-5 -rotate-90 text-red-500 drop-shadow-md"
-          icon="tabler:pin"
-        />
+        <Box asChild left="-0.5rem" position="absolute" top="-0.5rem" zIndex="50">
+          <Icon
+            color="red-500"
+            icon="tabler:pin"
+            size="1.25rem"
+            style={{
+              filter: 'drop-shadow(0 4px 3px rgb(0 0 0 / 0.07))',
+              transform: 'rotate(-90deg)'
+            }}
+          />
+        </Box>
       )}
-      <div className="w-full min-w-0 space-y-3">
-        <div className="flex-between">
-          <div className="text-bg-400 dark:text-bg-600 flex items-center gap-2">
+      <Stack gap="sm" minWidth="0" width="100%">
+        <Flex justify="between">
+          <Flex align="center" gap="sm">
             <Icon
-              className="size-5"
+              color={{ base: 'bg-400', dark: 'bg-600' }}
               icon={
                 {
                   text: 'tabler:article',
@@ -74,24 +83,31 @@ function IdeaWrapper({
                   image: 'tabler:photo'
                 }[entry.type] || 'tabler:article'
               }
+              size="1.25rem"
             />
-            <h3 className="font-medium">{t(`entryType.${entry.type}`)}</h3>
-          </div>
+            <Text
+              as="h3"
+              color={{ base: 'bg-400', dark: 'bg-600' }}
+              weight="medium"
+            >
+              {t(`entryType.${entry.type}`)}
+            </Text>
+          </Flex>
           <EntryContextMenu entry={entry} />
-        </div>
+        </Flex>
         {children}
         {entry.tags !== null && entry.tags?.length !== 0 && (
-          <div className="flex flex-wrap gap-1">
+          <Flex gap="xs" wrap="wrap">
             {entry.tags?.map((tag: string, index: number) => (
               <TagChip key={index} text={tag} />
             ))}
-          </div>
+          </Flex>
         )}
-        <div className="text-bg-500 text-sm">
+        <Text color="muted" size="sm">
           {dayjs(entry.created).fromNow()}
-        </div>
+        </Text>
         {entry.type === 'text' && <InFolderChip entry={entry} />}
-      </div>
+      </Stack>
     </Card>
   )
 }

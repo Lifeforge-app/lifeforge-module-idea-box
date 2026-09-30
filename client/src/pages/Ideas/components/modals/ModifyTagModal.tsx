@@ -1,11 +1,27 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router'
+import z from 'zod'
 
-import type { InferInput } from '@lifeforge/api'
-import { FormModal, defineForm, toast } from '@lifeforge/ui'
+import {
+  ColorField,
+  FormModal,
+  IconField,
+  TextField,
+  createDefaultValues,
+  toast
+} from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
 import type { IdeaBoxTag } from '@/providers/IdeaBoxProvider'
+
+const schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  icon: z.string(),
+  color: z.string(),
+  container: z.string()
+})
 
 function ModifyTagModal({
   data: { type, initialData },
@@ -34,47 +50,44 @@ function ModifyTagModal({
     })
   )
 
-  const { formProps } = defineForm<
-    InferInput<(typeof forgeAPI.tags)[typeof type]>['body']
-  >({
-    title: `tag.${type}`,
-    icon: {
-      create: 'tabler:plus',
-      update: 'tabler:pencil'
-    }[type],
-    namespace: 'apps.ideaBox',
-    onClose,
-    submitButton: type
+  const form = useForm({
+    defaultValues: {
+      ...createDefaultValues(schema),
+      name: initialData?.name || '',
+      icon: initialData?.icon || '',
+      color: initialData?.color || ''
+    },
+    resolver: zodResolver(schema)
   })
-    .typesMap({
-      name: 'text',
-      icon: 'icon',
-      color: 'color',
-      container: 'text'
-    })
-    .setupFields({
-      name: {
-        required: true,
-        label: 'Tag name',
-        icon: 'tabler:tag',
-        placeholder: 'My tag'
-      },
-      icon: {
-        label: 'Tag icon',
-        type: 'icon'
-      },
-      color: {
-        label: 'Tag color',
-        type: 'color'
-      }
-    })
-    .initialData(initialData)
-    .onSubmit(async data => {
-      await mutation.mutateAsync({ ...data, container: id || '' })
-    })
-    .build()
 
-  return <FormModal {...formProps} />
+  return (
+    <FormModal
+      form={form}
+      submissionConfig={{
+        template: type,
+        handler: async formData => {
+          await mutation.mutateAsync({ ...formData, container: id || '' })
+        }
+      }}
+      uiConfig={{
+        icon: type === 'create' ? 'tabler:plus' : 'tabler:pencil',
+        title: `tag.${type}`,
+        namespace: 'apps.ideaBox',
+        onClose
+      }}
+    >
+      <TextField
+        required
+        control={form.control}
+        icon="tabler:tag"
+        label="tagName"
+        name="name"
+        placeholder="My tag"
+      />
+      <IconField control={form.control} label="tagIcon" name="icon" />
+      <ColorField control={form.control} label="tagColor" name="color" />
+    </FormModal>
+  )
 }
 
 export default ModifyTagModal

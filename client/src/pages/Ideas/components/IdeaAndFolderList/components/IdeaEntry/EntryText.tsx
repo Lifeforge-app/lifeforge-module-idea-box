@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import Markdown from 'react-markdown'
 
+import { Box, Prose, Text } from '@lifeforge/ui'
+
 import type { IdeaBoxIdea } from '@/providers/IdeaBoxProvider'
 
 import IdeaWrapper from './components/IdeaWrapper'
@@ -20,13 +22,22 @@ function EntryText({ entry }: { entry: IdeaBoxIdea }) {
       }}
     >
       {!expanded ? (
-        <p className="line-clamp-6 w-full min-w-0 overflow-hidden break-all whitespace-pre-wrap !select-text">
-          {entry.content}
-        </p>
+        <Box asChild minWidth="0" width="100%">
+          <Text
+            as="p"
+            lineClamp={6}
+            overflow="hidden"
+            style={{ userSelect: 'text' }}
+            whiteSpace="pre-wrap"
+            wordBreak="break-all"
+          >
+            {entry.content}
+          </Text>
+        </Box>
       ) : (
-        <div className="prose flex flex-col break-all whitespace-pre-wrap">
+        <Prose style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
           <Markdown>{entry.content}</Markdown>
-        </div>
+        </Prose>
       )}
     </IdeaWrapper>
   )

@@ -179,13 +179,19 @@ const createSchema = ideaBoxSchemas.entries
     updated: true,
     type: true,
     archived: true,
-    pinned: true
+    pinned: true,
+    collectionId: true,
+    collectionName: true,
+    id: true
   })
   .and(
     z.union([
       ideaBoxSchemas.entries_text
         .omit({
-          base_entry: true
+          base_entry: true,
+          collectionId: true,
+          collectionName: true,
+          id: true
         })
         .extend({
           type: z.literal('text')
@@ -193,14 +199,20 @@ const createSchema = ideaBoxSchemas.entries
       ideaBoxSchemas.entries_image
         .omit({
           base_entry: true,
-          image: true
+          image: true,
+          collectionId: true,
+          collectionName: true,
+          id: true
         })
         .extend({
           type: z.literal('image')
         }),
       ideaBoxSchemas.entries_link
         .omit({
-          base_entry: true
+          base_entry: true,
+          collectionId: true,
+          collectionName: true,
+          id: true
         })
         .extend({
           type: z.literal('link')
@@ -297,13 +309,19 @@ const updateSchema = ideaBoxSchemas.entries
     folder: true,
     container: true,
     archived: true,
-    pinned: true
+    pinned: true,
+    collectionId: true,
+    collectionName: true,
+    id: true
   })
   .and(
     z.union([
       ideaBoxSchemas.entries_text
         .omit({
-          base_entry: true
+          base_entry: true,
+          collectionId: true,
+          collectionName: true,
+          id: true
         })
         .extend({
           type: z.literal('text')
@@ -311,14 +329,20 @@ const updateSchema = ideaBoxSchemas.entries
       ideaBoxSchemas.entries_image
         .omit({
           base_entry: true,
-          image: true
+          image: true,
+          collectionId: true,
+          collectionName: true,
+          id: true
         })
         .extend({
           type: z.literal('image')
         }),
       ideaBoxSchemas.entries_link
         .omit({
-          base_entry: true
+          base_entry: true,
+          collectionId: true,
+          collectionName: true,
+          id: true
         })
         .extend({
           type: z.literal('link')

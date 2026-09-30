@@ -64,7 +64,11 @@ export const create = forge
   .mutation({
     description: 'Create a new folder',
     input: {
-      body: ideaBoxSchemas.folders
+      body: ideaBoxSchemas.folders.omit({
+        collectionId: true,
+        collectionName: true,
+        id: true
+      })
     },
     existenceCheck: {
       body: {
@@ -90,7 +94,10 @@ export const update = forge
       }),
       body: ideaBoxSchemas.folders.omit({
         container: true,
-        parent: true
+        parent: true,
+        collectionId: true,
+        collectionName: true,
+        id: true
       })
     },
     existenceCheck: {

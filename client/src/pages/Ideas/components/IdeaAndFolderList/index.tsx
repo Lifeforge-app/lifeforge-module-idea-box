@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 
 import { useModuleTranslation } from '@lifeforge/localization'
-import { EmptyStateScreen, WithQuery, useModalStore } from '@lifeforge/ui'
+import { Box, EmptyStateScreen, WithQuery, useModalStore } from '@lifeforge/ui'
 
 import { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 
@@ -32,7 +32,7 @@ function IdeaAndFolderList() {
   }, [])
 
   return (
-    <div className="mt-6 mb-20">
+    <Box mt="lg" style={{ marginBottom: '5rem' }}>
       {searchQuery.trim().length === 0 && selectedTags.length === 0 ? (
         <WithQuery query={entriesQuery}>
           {data => (
@@ -40,7 +40,7 @@ function IdeaAndFolderList() {
               {folders => (
                 <>
                   {data.length === 0 && folders.length === 0 ? (
-                    <div className="mt-6">
+                    <Box mt="lg">
                       {!viewArchived ? (
                         <EmptyStateScreen
                           CTAButtonProps={{
@@ -64,7 +64,7 @@ function IdeaAndFolderList() {
                           }}
                         />
                       )}
-                    </div>
+                    </Box>
                   ) : (
                     <>
                       {folders.length > 0 && !viewArchived && <FolderList />}
@@ -81,14 +81,14 @@ function IdeaAndFolderList() {
           {searchResults => (
             <>
               {searchResults.length === 0 ? (
-                <div className="mt-6">
+                <Box mt="lg">
                   <EmptyStateScreen
                     icon="tabler:search"
                     message={{
                       id: 'result'
                     }}
                   />
-                </div>
+                </Box>
               ) : (
                 <IdeaList data={searchResults} />
               )}
@@ -96,7 +96,7 @@ function IdeaAndFolderList() {
           )}
         </WithQuery>
       )}
-    </div>
+    </Box>
   )
 }
 

@@ -39,7 +39,11 @@ export const create = forge
   .mutation({
     description: 'Create a new tag',
     input: {
-      body: ideaBoxSchemas.tags
+      body: ideaBoxSchemas.tags.omit({
+        collectionId: true,
+        collectionName: true,
+        id: true
+      })
     },
     existenceCheck: {
       query: { container: 'containers' }
@@ -61,7 +65,10 @@ export const update = forge
         id: z.string()
       }),
       body: ideaBoxSchemas.tags.omit({
-        container: true
+        container: true,
+        collectionId: true,
+        collectionName: true,
+        id: true
       })
     },
     existenceCheck: {

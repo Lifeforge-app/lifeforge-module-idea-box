@@ -15,8 +15,12 @@ function IdeaList({ data }: { data: IdeaBoxIdea[] }) {
 
   return (
     <Column
-      className="mb-8 shrink-0 overflow-x-visible!"
       gap="0.5rem"
+      rootStyles={{
+        flexShrink: 0,
+        marginBottom: '2rem',
+        overflowX: 'visible'
+      }}
       queries={[
         {
           columns: 1,

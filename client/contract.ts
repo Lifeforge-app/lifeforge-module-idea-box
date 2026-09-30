@@ -24,24 +24,12 @@ export const contract = {
             },
             "name": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
             "icon",
             "color",
-            "name",
-            "id",
-            "collectionId",
-            "collectionName"
+            "name"
           ],
           "additionalProperties": false
         }
@@ -382,24 +370,12 @@ export const contract = {
             },
             "name": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
             "icon",
             "color",
-            "name",
-            "id",
-            "collectionId",
-            "collectionName"
+            "name"
           ],
           "additionalProperties": false
         }
@@ -510,15 +486,6 @@ export const contract = {
             },
             "parent": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
@@ -526,10 +493,7 @@ export const contract = {
             "name",
             "color",
             "icon",
-            "parent",
-            "id",
-            "collectionId",
-            "collectionName"
+            "parent"
           ],
           "additionalProperties": false
         }
@@ -868,24 +832,12 @@ export const contract = {
             },
             "icon": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
             "name",
             "color",
-            "icon",
-            "id",
-            "collectionId",
-            "collectionName"
+            "icon"
           ],
           "additionalProperties": false
         }
@@ -1043,24 +995,12 @@ export const contract = {
                 "folder": {
                   "type": "string"
                 },
-                "tags": {},
-                "id": {
-                  "type": "string"
-                },
-                "collectionId": {
-                  "type": "string"
-                },
-                "collectionName": {
-                  "type": "string"
-                }
+                "tags": {}
               },
               "required": [
                 "container",
                 "folder",
-                "tags",
-                "id",
-                "collectionId",
-                "collectionName"
+                "tags"
               ]
             },
             {
@@ -1071,15 +1011,6 @@ export const contract = {
                     "content": {
                       "type": "string"
                     },
-                    "id": {
-                      "type": "string"
-                    },
-                    "collectionId": {
-                      "type": "string"
-                    },
-                    "collectionName": {
-                      "type": "string"
-                    },
                     "type": {
                       "type": "string",
                       "const": "text"
@@ -1087,33 +1018,18 @@ export const contract = {
                   },
                   "required": [
                     "content",
-                    "id",
-                    "collectionId",
-                    "collectionName",
                     "type"
                   ]
                 },
                 {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "collectionId": {
-                      "type": "string"
-                    },
-                    "collectionName": {
-                      "type": "string"
-                    },
                     "type": {
                       "type": "string",
                       "const": "image"
                     }
                   },
                   "required": [
-                    "id",
-                    "collectionId",
-                    "collectionName",
                     "type"
                   ]
                 },
@@ -1124,15 +1040,6 @@ export const contract = {
                       "type": "string",
                       "format": "uri"
                     },
-                    "id": {
-                      "type": "string"
-                    },
-                    "collectionId": {
-                      "type": "string"
-                    },
-                    "collectionName": {
-                      "type": "string"
-                    },
                     "type": {
                       "type": "string",
                       "const": "link"
@@ -1140,9 +1047,6 @@ export const contract = {
                   },
                   "required": [
                     "link",
-                    "id",
-                    "collectionId",
-                    "collectionName",
                     "type"
                   ]
                 }
@@ -1633,22 +1537,10 @@ export const contract = {
             {
               "type": "object",
               "properties": {
-                "tags": {},
-                "id": {
-                  "type": "string"
-                },
-                "collectionId": {
-                  "type": "string"
-                },
-                "collectionName": {
-                  "type": "string"
-                }
+                "tags": {}
               },
               "required": [
-                "tags",
-                "id",
-                "collectionId",
-                "collectionName"
+                "tags"
               ]
             },
             {
@@ -1659,15 +1551,6 @@ export const contract = {
                     "content": {
                       "type": "string"
                     },
-                    "id": {
-                      "type": "string"
-                    },
-                    "collectionId": {
-                      "type": "string"
-                    },
-                    "collectionName": {
-                      "type": "string"
-                    },
                     "type": {
                       "type": "string",
                       "const": "text"
@@ -1675,33 +1558,18 @@ export const contract = {
                   },
                   "required": [
                     "content",
-                    "id",
-                    "collectionId",
-                    "collectionName",
                     "type"
                   ]
                 },
                 {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "collectionId": {
-                      "type": "string"
-                    },
-                    "collectionName": {
-                      "type": "string"
-                    },
                     "type": {
                       "type": "string",
                       "const": "image"
                     }
                   },
                   "required": [
-                    "id",
-                    "collectionId",
-                    "collectionName",
                     "type"
                   ]
                 },
@@ -1712,15 +1580,6 @@ export const contract = {
                       "type": "string",
                       "format": "uri"
                     },
-                    "id": {
-                      "type": "string"
-                    },
-                    "collectionId": {
-                      "type": "string"
-                    },
-                    "collectionName": {
-                      "type": "string"
-                    },
                     "type": {
                       "type": "string",
                       "const": "link"
@@ -1728,9 +1587,6 @@ export const contract = {
                   },
                   "required": [
                     "link",
-                    "id",
-                    "collectionId",
-                    "collectionName",
                     "type"
                   ]
                 }
@@ -1828,25 +1684,13 @@ export const contract = {
             },
             "container": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
             "name",
             "icon",
             "color",
-            "container",
-            "id",
-            "collectionId",
-            "collectionName"
+            "container"
           ],
           "additionalProperties": false
         }
@@ -2022,24 +1866,12 @@ export const contract = {
             },
             "color": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
             "name",
             "icon",
-            "color",
-            "id",
-            "collectionId",
-            "collectionName"
+            "color"
           ],
           "additionalProperties": false
         }

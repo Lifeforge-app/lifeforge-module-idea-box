@@ -36,8 +36,9 @@ function IdeaBox() {
         trailing={
           <>
             <Button
-              className="ml-4 hidden md:flex"
+              display={{ base: 'none', md: 'flex' }}
               icon="tabler:plus"
+              ml="md"
               tProps={{
                 item: t('items.container')
               }}

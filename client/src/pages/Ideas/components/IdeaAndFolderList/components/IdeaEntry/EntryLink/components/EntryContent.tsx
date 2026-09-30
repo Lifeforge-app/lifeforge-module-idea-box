@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { memo } from 'react'
 
+import { Stack, Text, surface } from '@lifeforge/ui'
+
 import { forgeAPI } from '@/manifest'
 import type { IdeaBoxIdea } from '@/providers/IdeaBoxProvider'
 
@@ -16,8 +18,13 @@ function EntryContent({ entry }: { entry: IdeaBoxIdea }) {
   }
 
   return OGQuery.isSuccess && OGQuery.data ? (
-    <button
-      className="shadow-custom component-bg-lighter-with-hover w-full cursor-pointer space-y-2 rounded-md p-2 text-left"
+    <Stack
+      as="button"
+      bg={surface.lightInteractive}
+      p="sm"
+      r="md"
+      shadow
+      style={{ cursor: 'pointer', textAlign: 'left' }}
       onClick={() => {
         const a = document.createElement('a')
 
@@ -30,7 +37,6 @@ function EntryContent({ entry }: { entry: IdeaBoxIdea }) {
       {OGQuery.data.ogImage !== undefined && (
         <img
           alt=""
-          className="w-full rounded-md border-0 object-contain"
           src={(() => {
             const url: string = OGQuery.data.ogImage?.[0].url
 
@@ -42,29 +48,41 @@ function EntryContent({ entry }: { entry: IdeaBoxIdea }) {
 
             return url
           })()}
+          style={{
+            border: 0,
+            borderRadius: 'var(--radius-md)',
+            objectFit: 'contain',
+            width: '100%'
+          }}
         />
       )}
-      <p className="text-custom-500 text-xs font-medium">
+      <Text color="primary" size="xs" weight="medium">
         {OGQuery.data.ogSiteName ?? new URL(entry.link).hostname}
-      </p>
+      </Text>
       {OGQuery.data.ogTitle !== undefined && (
-        <p className="text-sm font-medium">{OGQuery.data.ogTitle}</p>
+        <Text size="sm" weight="medium">
+          {OGQuery.data.ogTitle}
+        </Text>
       )}
       {OGQuery.data.ogDescription !== undefined && (
-        <p className="text-bg-500 mt-2 text-xs break-words">
+        <Text color="muted" mt="sm" overflowWrap="break-word" size="xs">
           {OGQuery.data.ogDescription}
-        </p>
+        </Text>
       )}
-    </button>
+    </Stack>
   ) : (
-    <a
-      className="text-custom-500 break-all underline underline-offset-2"
+    <Text
+      as="a"
+      color="primary"
+      decoration="underline"
       href={entry.link}
       rel="noreferrer"
+      style={{ textUnderlineOffset: '2px' }}
       target="_blank"
+      wordBreak="break-all"
     >
       {entry.link}
-    </a>
+    </Text>
   )
 }
 

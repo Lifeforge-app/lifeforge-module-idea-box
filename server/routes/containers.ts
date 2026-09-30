@@ -64,7 +64,10 @@ export const create = forge
       body: ideaBoxSchemas.containers.omit({
         cover: true,
         hidden: true,
-        pinned: true
+        pinned: true,
+        collectionId: true,
+        collectionName: true,
+        id: true
       })
     },
     media: {
@@ -107,7 +110,10 @@ export const update = forge
       body: ideaBoxSchemas.containers.omit({
         cover: true,
         hidden: true,
-        pinned: true
+        pinned: true,
+        collectionId: true,
+        collectionName: true,
+        id: true
       })
     },
     media: {

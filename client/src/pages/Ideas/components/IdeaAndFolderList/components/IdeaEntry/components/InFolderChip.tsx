@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router'
 
-import { TagChip } from '@lifeforge/ui'
+import { Flex, TagChip, Text } from '@lifeforge/ui'
 
 import {
   type IdeaBoxIdea,
@@ -17,8 +17,8 @@ function InFolderChip({ entry }: { entry: IdeaBoxIdea }) {
   }
 
   return (
-    <span className="mt-3 flex items-center gap-2 text-sm">
-      In
+    <Flex as="span" align="center" gap="sm" mt="sm">
+      <Text size="sm">In</Text>
       <TagChip
         color={entry.expand.folder.color}
         icon={entry.expand.folder.icon}
@@ -38,7 +38,7 @@ function InFolderChip({ entry }: { entry: IdeaBoxIdea }) {
           setSearchQuery('')
         }}
       />
-    </span>
+    </Flex>
   )
 }
 

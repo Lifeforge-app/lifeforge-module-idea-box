@@ -1,8 +1,7 @@
-import clsx from 'clsx'
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback } from 'react'
 import tinycolor from 'tinycolor2'
 
-import { Icon } from '@lifeforge/ui'
+import { Flex, Icon, colorWithOpacity } from '@lifeforge/ui'
 
 function HamburgerButton({
   tagColor,
@@ -13,20 +12,6 @@ function HamburgerButton({
   isSelected: boolean
   onUpdate: (e: React.MouseEvent<HTMLButtonElement>) => void
 }) {
-  const hamburgerIconColor = useMemo(() => {
-    if (!isSelected) {
-      return 'text-bg-500 dark:hover:bg-bg-600 dark:hover:text-bg-100 hover:bg-bg-300'
-    }
-
-    if (tagColor === '') {
-      return 'text-custom-500 hover:bg-custom-500/30 hover:text-custom-500'
-    }
-
-    return tinycolor(tagColor).isLight()
-      ? 'text-bg-800 hover:bg-bg-800 hover:text-bg-100'
-      : 'text-bg-100 hover:bg-bg-100 hover:text-bg-800'
-  }, [isSelected, tagColor])
-
   const handleUpdate = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation()
@@ -36,15 +21,42 @@ function HamburgerButton({
   )
 
   return (
-    <button
-      className={clsx(
-        'hidden aspect-square h-full items-center justify-center rounded-full text-xs transition-all group-hover:flex',
-        hamburgerIconColor
-      )}
+    <Flex
+      as="button"
+      align="center"
+      bg={
+        !isSelected
+          ? { hover: 'bg-300', darkHover: 'bg-600' }
+          : tagColor === ''
+            ? { hover: colorWithOpacity('primary', '30%') }
+            : tinycolor(tagColor).isLight()
+              ? { hover: 'bg-800' }
+              : { hover: 'bg-100' }
+      }
+      justify="center"
+      r="full"
+      style={{
+        aspectRatio: '1',
+        cursor: 'pointer',
+        height: '100%',
+        transition: 'all 100ms'
+      }}
       onClick={handleUpdate}
     >
-      <Icon icon="tabler:dots-vertical" />
-    </button>
+      <Icon
+        size="1em"
+        color={
+          !isSelected
+            ? { base: 'muted', hover: 'bg-100' }
+            : tagColor === ''
+              ? 'primary'
+              : tinycolor(tagColor).isLight()
+                ? { base: 'bg-800', hover: 'bg-100' }
+                : { base: 'bg-100', hover: 'bg-800' }
+        }
+        icon="tabler:dots-vertical"
+      />
+    </Flex>
   )
 }
 

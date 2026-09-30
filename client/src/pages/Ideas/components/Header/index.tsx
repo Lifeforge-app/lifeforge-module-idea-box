@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import clsx from 'clsx'
 import { Link, useParams } from 'react-router'
 
-import { Icon } from '@lifeforge/ui'
+import { Box, Flex, Icon, Stack, Text, colorWithOpacity } from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
 import { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
@@ -28,109 +27,149 @@ function Header() {
   const pathDetails = pathDetailsQuery.data
 
   return (
-    <header className="space-y-3">
+    <Stack as="header" gap="sm">
       <GoBackButtonAndMenu />
-      <div
-        className={clsx(
-          'relative isolate flex h-56 w-full items-end justify-between rounded-lg bg-cover bg-center bg-no-repeat p-6 sm:h-72',
+      <Flex
+        align="end"
+        bg={
           pathDetails?.container.cover
-            ? 'bg-bg-900'
-            : 'bg-bg-200 dark:bg-bg-800'
-        )}
-        style={
-          pathDetails?.container.cover
-            ? {
-                backgroundImage:
-                  pathDetails?.container &&
-                  `url(${forgeAPI.getMedia({
-                    collectionId: pathDetails.container.collectionId,
-                    recordId: pathDetails.container.id,
-                    fieldId: pathDetails.container.cover
-                  })})`
-              }
-            : undefined
+            ? 'bg-900'
+            : { base: 'bg-200', dark: 'bg-800' }
         }
+        height={{ base: '14rem', sm: '18rem' }}
+        justify="between"
+        p="lg"
+        position="relative"
+        r="lg"
+        style={{
+          backgroundImage:
+            pathDetails?.container.cover &&
+            `url(${forgeAPI.getMedia({
+              collectionId: pathDetails.container.collectionId,
+              recordId: pathDetails.container.id,
+              fieldId: pathDetails.container.cover
+            })})`,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          isolation: 'isolate'
+        }}
+        width="100%"
       >
         {pathDetails?.container.cover && (
-          <div className="absolute inset-0 rounded-lg bg-[linear-gradient(to_bottom,rgba(0,0,0,0)_0%,rgba(0,0,0,0.7)_80%)]"></div>
+          <Box
+            inset="0"
+            position="absolute"
+            r="lg"
+            style={{
+              backgroundImage:
+                'linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 80%)'
+            }}
+          />
         )}
-        <div className="flex-between relative z-9999 flex w-full">
-          <h1
-            className={clsx(
-              'flex items-center gap-3 text-2xl font-semibold sm:text-3xl',
+        <Flex justify="between" position="relative" width="100%" zIndex="9999">
+          <Text
+            asChild
+            color={
               pathDetails?.container.cover
-                ? 'text-bg-100'
-                : 'text-bg-900 dark:text-bg-100'
-            )}
+                ? 'bg-100'
+                : { base: 'bg-900', dark: 'bg-100' }
+            }
+            size={{ base: '2xl', sm: '3xl' }}
+            weight="semibold"
           >
-            {(() => {
-              if (!pathDetails) {
-                return (
-                  <>
-                    <Icon
-                      className="text-bg-500 size-5"
-                      icon="svg-spinners:ring-resize"
-                    />
-                    Loading...
-                  </>
-                )
-              } else {
-                return (
-                  <div className="flex flex-wrap items-center gap-3">
-                    <ContainerName
-                      color={pathDetails.container.color}
-                      icon={pathDetails.container.icon}
-                      id={pathDetails.container.id}
-                      name={pathDetails.container.name}
-                    />
-                    {pathDetails.route.length > 0 && (
+            <Flex as="h1" align="center" gap="sm">
+              {(() => {
+                if (!pathDetails) {
+                  return (
+                    <>
                       <Icon
-                        className="size-5 text-gray-500"
-                        icon="tabler:chevron-right"
+                        color="muted"
+                        icon="svg-spinners:ring-resize"
+                        size="1.25rem"
                       />
-                    )}
-                    {pathDetails.route.map((folder, index) => (
-                      <>
-                        <Link
-                          key={folder.id}
-                          className="relative flex items-center gap-2 rounded-lg p-3 text-base before:absolute before:top-0 before:left-0 before:size-full before:rounded-md before:transition-all hover:before:bg-white/5 in-[.bordered]:border-2"
-                          style={{
-                            borderColor: folder.color + '20',
-                            backgroundColor: folder.color + '20',
-                            color: folder.color
-                          }}
-                          to={`/idea-box/${id}/${path
-                            ?.split('/')
-                            .slice(0, index + 1)
-                            .join('/')
-                            .replace('//', '/')}`}
-                          onClick={() => {
-                            setSelectedTags([])
-                            setSearchQuery('')
-                          }}
-                        >
-                          <Icon
-                            className="shrink-0 text-xl"
-                            icon={folder.icon}
-                          />
-                          <span className="hidden md:block">{folder.name}</span>
-                        </Link>
-                        {index !== pathDetails.route.length - 1 && (
-                          <Icon
-                            className="size-5 text-gray-500"
-                            icon="tabler:chevron-right"
-                          />
-                        )}
-                      </>
-                    ))}
-                  </div>
-                )
-              }
-            })()}
-          </h1>
-        </div>
-      </div>
-    </header>
+                      Loading...
+                    </>
+                  )
+                } else {
+                  return (
+                    <Flex align="center" gap="sm" wrap="wrap">
+                      <ContainerName
+                        color={pathDetails.container.color}
+                        icon={pathDetails.container.icon}
+                        id={pathDetails.container.id}
+                        name={pathDetails.container.name}
+                      />
+                      {pathDetails.route.length > 0 && (
+                        <Icon
+                          color="gray-500"
+                          icon="tabler:chevron-right"
+                          size="1.25rem"
+                        />
+                      )}
+                      {pathDetails.route.map((folder, index) => (
+                        <>
+                          <Box
+                            key={folder.id}
+                            asChild
+                            overflow="hidden"
+                            r="lg"
+                            style={{
+                              backgroundColor: folder.color + '20',
+                              color: folder.color
+                            }}
+                          >
+                            <Link
+                              to={`/idea-box/${id}/${path
+                                ?.split('/')
+                                .slice(0, index + 1)
+                                .join('/')
+                                .replace('//', '/')}`}
+                              onClick={() => {
+                                setSelectedTags([])
+                                setSearchQuery('')
+                              }}
+                            >
+                              <Flex
+                                align="center"
+                                bg={{
+                                  hover: colorWithOpacity('bg-50', '5%')
+                                }}
+                                gap="sm"
+                                p="sm"
+                              >
+                                <Icon
+                                  size="1.25rem"
+                                  icon={folder.icon}
+                                  style={{ color: folder.color }}
+                                />
+                                <Text
+                                  size="base"
+                                  display={{ base: 'none', md: 'block' }}
+                                >
+                                  {folder.name}
+                                </Text>
+                              </Flex>
+                            </Link>
+                          </Box>
+                          {index !== pathDetails.route.length - 1 && (
+                            <Icon
+                              color="gray-500"
+                              icon="tabler:chevron-right"
+                              size="1.25rem"
+                            />
+                          )}
+                        </>
+                      ))}
+                    </Flex>
+                  )
+                }
+              })()}
+            </Flex>
+          </Text>
+        </Flex>
+      </Flex>
+    </Stack>
   )
 }
 

@@ -1,12 +1,54 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { useParams } from 'react-router'
+import z from 'zod'
 
-import type { InferInput, InferOutput } from '@lifeforge/api'
+import type { InferOutput } from '@lifeforge/api'
 import { useModuleTranslation } from '@lifeforge/localization'
-import { FormModal, defineForm, toast } from '@lifeforge/ui'
+import {
+  FileField,
+  FormModal,
+  ListboxField,
+  TextAreaField,
+  TextField,
+  convertFormFileFieldData,
+  createDefaultValues,
+  fileValueSchema,
+  getFormFileFieldInitialData,
+  toast
+} from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
+
+const schema = z
+  .object({
+    type: z.enum(['text', 'link', 'image']),
+    content: z.string(),
+    link: z.string(),
+    image: fileValueSchema,
+    folder: z.string(),
+    container: z.string(),
+    tags: z.array(z.string())
+  })
+  .superRefine((data, ctx) => {
+    if (data.type === 'text' && !data.content.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Content is required',
+        path: ['content']
+      })
+    }
+
+    if (data.type === 'link' && !data.link.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Link is required',
+        path: ['link']
+      })
+    }
+  })
 
 function ModifyIdeaModal({
   data: { type, initialData },
@@ -53,169 +95,47 @@ function ModifyIdeaModal({
     })
   )
 
-  const { formProps } = defineForm<
-    InferInput<(typeof forgeAPI.ideas)[typeof type]>['body']
-  >({
-    icon: type === 'create' ? 'tabler:plus' : 'tabler:pencil',
-    title: `idea.${type}`,
-    onClose,
-    namespace: 'apps.ideaBox',
-    loading: tagsQuery.isLoading,
-    submitButton: type
-  })
-    .typesMap({
-      content: 'textarea',
-      link: 'text',
-      image: 'file',
-      type: 'listbox',
-      folder: 'text',
-      container: 'text',
-      tags: 'listbox'
-    })
-    .setupFields({
-      type: {
-        multiple: false,
-        required: true,
-        label: 'Idea type',
-        icon: 'tabler:category',
-        options: [
-          {
-            value: 'text',
-            text: t('entryType.text'),
-            icon: 'tabler:text-size'
-          },
-          {
-            value: 'link',
-            text: t('entryType.link'),
-            icon: 'tabler:link'
-          },
-          {
-            value: 'image',
-            text: t('entryType.image'),
-            icon: 'tabler:photo'
-          }
-        ],
-        disabled: type === 'update'
-      },
-      content: {
-        required: true,
-        label: 'Idea content',
-        icon: 'tabler:text-wrap',
-        placeholder: 'Idea content'
-      },
-      link: {
-        required: true,
-        label: 'Idea link',
-        icon: 'tabler:link',
-        placeholder: 'https://example.com/your-idea'
-      },
-      image: {
-        label: 'Idea image',
-        icon: 'tabler:photo',
-        optional: true,
-        required: true,
-        enableUrl: true
-      },
-      tags: {
-        multiple: true,
-        label: 'Idea Tags',
-        icon: 'tabler:tags',
-        options:
-          tagsQuery.data?.map(tag => ({
-            text: tag.name,
-            value: tag.id,
-            icon: tag.icon || 'tabler:tag',
-            color: tag.color || 'gray'
-          })) || [],
-        placeholder: 'Select or create tags'
-      }
-    })
-    .initialData(
-      initialData && {
-        type: (initialData.type as 'text' | 'link' | 'image') ?? 'text',
-        ...(initialData.type === 'text'
-          ? { content: initialData.content }
-          : initialData.type === 'link'
-            ? { link: initialData.link }
-            : {
-                image:
-                  initialData.type === 'image'
-                    ? {
-                        file:
-                          typeof initialData.image === 'string' &&
-                          initialData.image.length > 0
-                            ? 'keep'
-                            : (initialData.image as unknown as File) instanceof
-                                File
-                              ? (initialData.image as unknown as File)
-                              : null,
-                        preview: initialData.image
-                          ? typeof initialData.image === 'string'
-                            ? forgeAPI.getMedia({
-                                collectionId: initialData.child!.collectionId!,
-                                recordId: initialData.child!.id!,
-                                fieldId: initialData.image
-                              })
-                            : (initialData.image as File | undefined) instanceof
-                                File
-                              ? URL.createObjectURL(
-                                  initialData.image as unknown as File
-                                )
-                              : null
-                          : null
-                      }
-                    : undefined
-              }),
-        tags:
-          initialData.tags?.map(
-            (tag: string) =>
-              tagsQuery.data?.find(t => t.name === tag)?.id || tag
-          ) || []
-      }
-    )
-    .conditionalFields({
-      content: data => data.type === 'text',
-      link: data => data.type === 'link',
-      image: data => data.type === 'image'
-    })
-    .onSubmit(async data => {
-      data.tags =
-        data.tags?.map(
-          tag => tagsQuery.data?.find(t => t.id === tag)?.name || tag
+  const form = useForm({
+    defaultValues: {
+      ...createDefaultValues(schema),
+      type: (initialData?.type as 'text' | 'link' | 'image') ?? 'text',
+      content: initialData?.type === 'text' ? initialData.content || '' : '',
+      link: initialData?.type === 'link' ? initialData.link || '' : '',
+      image: getFormFileFieldInitialData(
+        forgeAPI,
+        initialData?.child,
+        initialData?.image as File | string | null | undefined
+      ),
+      tags:
+        initialData?.tags?.map(
+          tag => tagsQuery.data?.find(t => t.name === tag)?.id || tag
         ) || []
+    },
+    resolver: zodResolver(schema)
+  })
 
-      switch (data.type) {
-        case 'text':
-          await mutation.mutateAsync({
-            content: data.content.trim(),
-            type: 'text',
-            folder: path?.split('/').pop() ?? '',
-            container: id ?? '',
-            tags: data.tags,
-            image: data.image
-          })
-          break
-        case 'link':
-          await mutation.mutateAsync({
-            link: data.link.trim(),
-            type: 'link',
-            folder: path?.split('/').pop() ?? '',
-            container: id ?? '',
-            tags: data.tags,
-            image: data.image
-          })
-          break
-        case 'image':
-          await mutation.mutateAsync({
-            type: 'image',
-            folder: path?.split('/').pop() ?? '',
-            container: id ?? '',
-            tags: data.tags,
-            image: data.image
-          })
-      }
-    })
-    .build()
+  const watchedType = useWatch({ control: form.control, name: 'type' })
+
+  const typeOptions = [
+    {
+      value: 'text' as const,
+      text: t('entryType.text'),
+      icon: 'tabler:text-size'
+    },
+    { value: 'link' as const, text: t('entryType.link'), icon: 'tabler:link' },
+    {
+      value: 'image' as const,
+      text: t('entryType.image'),
+      icon: 'tabler:photo'
+    }
+  ]
+
+  const tagOptions = (tagsQuery.data || []).map(tag => ({
+    text: tag.name,
+    value: tag.id,
+    icon: tag.icon || 'tabler:tag',
+    color: tag.color || 'gray'
+  }))
 
   useEffect(() => {
     if (initialData?.isPasted && mutation.isIdle) {
@@ -226,7 +146,6 @@ function ModifyIdeaModal({
           container: id ?? '',
           tags: initialData.tags || [],
           image:
-            //@ts-expect-error - Lazy to fix
             initialData.image instanceof File ? initialData.image : undefined
         })
         .then(() => {
@@ -235,7 +154,100 @@ function ModifyIdeaModal({
     }
   }, [initialData])
 
-  return <FormModal {...formProps} />
+  return (
+    <FormModal
+      form={form}
+      submissionConfig={{
+        template: type,
+        handler: async formData => {
+          const tags =
+            formData.tags.map(
+              tag => tagsQuery.data?.find(t => t.id === tag)?.name || tag
+            ) || []
+
+          const payload = {
+            folder: path?.split('/').pop() ?? '',
+            container: id ?? '',
+            tags,
+            image: convertFormFileFieldData(formData.image)
+          }
+
+          switch (formData.type) {
+            case 'text':
+              await mutation.mutateAsync({
+                ...payload,
+                type: 'text',
+                content: formData.content.trim()
+              })
+              break
+            case 'link':
+              await mutation.mutateAsync({
+                ...payload,
+                type: 'link',
+                link: formData.link.trim()
+              })
+              break
+            case 'image':
+              await mutation.mutateAsync({ ...payload, type: 'image' })
+          }
+        }
+      }}
+      uiConfig={{
+        icon: type === 'create' ? 'tabler:plus' : 'tabler:pencil',
+        title: `idea.${type}`,
+        namespace: 'apps.ideaBox',
+        loading: tagsQuery.isLoading,
+        onClose
+      }}
+    >
+      <ListboxField
+        required
+        control={form.control}
+        disabled={type === 'update'}
+        icon="tabler:category"
+        label="ideaType"
+        name="type"
+        options={typeOptions}
+      />
+      {watchedType === 'text' && (
+        <TextAreaField
+          required
+          control={form.control}
+          icon="tabler:text-wrap"
+          label="ideaContent"
+          name="content"
+          placeholder="Idea content"
+        />
+      )}
+      {watchedType === 'link' && (
+        <TextField
+          required
+          control={form.control}
+          icon="tabler:link"
+          label="ideaLink"
+          name="link"
+          placeholder="https://example.com/your-idea"
+        />
+      )}
+      {watchedType === 'image' && (
+        <FileField
+          control={form.control}
+          icon="tabler:photo"
+          label="ideaImage"
+          name="image"
+          sources={{ url: true }}
+        />
+      )}
+      <ListboxField
+        multiple
+        control={form.control}
+        icon="tabler:tags"
+        label="ideaTags"
+        name="tags"
+        options={tagOptions}
+      />
+    </FormModal>
+  )
 }
 
 export default ModifyIdeaModal

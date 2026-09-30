@@ -1,7 +1,12 @@
 import { memo, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
-import { ContextMenu, ContextMenuItem, GoBackButton } from '@lifeforge/ui'
+import {
+  ContextMenu,
+  ContextMenuItem,
+  Flex,
+  GoBackButton
+} from '@lifeforge/ui'
 
 import { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 
@@ -28,7 +33,7 @@ function GoBackButtonAndMenu() {
   }, [])
 
   return (
-    <div className="flex-between w-full">
+    <Flex justify="between" width="100%">
       <GoBackButton onClick={handleGoBack} />
       <ContextMenu>
         <ContextMenuItem
@@ -37,7 +42,7 @@ function GoBackButtonAndMenu() {
           onClick={handleViewArchive}
         />
       </ContextMenu>
-    </div>
+    </Flex>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router'
 
-import { SearchInput } from '@lifeforge/ui'
+import { Box, SearchInput } from '@lifeforge/ui'
 
 import IdeaBoxProvider, { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 
@@ -18,7 +18,7 @@ function Ideas() {
       <Header />
       {!viewArchived && (
         <SearchInput
-          className="mt-4"
+          mt="md"
           debounceMs={300}
           searchTarget={path === '' ? 'idea' : 'idea In Folder'}
           value={searchQuery}

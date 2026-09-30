@@ -1,9 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
-import clsx from 'clsx'
 import { useDrag, useDrop } from 'react-dnd'
 import { Link, useParams } from 'react-router'
 
-import { Icon, toast } from '@lifeforge/ui'
+import { Box, Flex, Icon, Text, toast } from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
 import type { IdeaBoxFolder } from '@/providers/IdeaBoxProvider'
@@ -105,34 +104,46 @@ function FolderItem({ folder }: { folder: IdeaBoxFolder }) {
   }
 
   return (
-    <Link
+    <Text
       key={folder.id}
-      ref={node => {
-        dragRef(node)
-        drop(node)
-      }}
-      className={clsx(
-        'flex-between shadow-custom relative isolate flex rounded-md p-4 font-medium backdrop-blur-xs transition-all before:absolute before:top-0 before:left-0 before:size-full before:rounded-md before:transition-all hover:before:bg-white/5 in-[.bordered]:border-2',
-        isOver && 'text-bg-50 dark:text-bg-800',
-        isDragging && 'cursor-move'
-      )}
-      style={{
-        ...getStyle({
-          isOver,
-          canDrop,
-          folderColor: folder.color,
-          opacity
-        }),
-        borderColor: folder.color + 20
-      }}
-      to={`/idea-box/${id}/${path}/${folder.id}`.replace('//', '/')}
+      asChild
+      color={canDrop && isOver ? { base: 'bg-50', dark: 'bg-800' } : undefined}
     >
-      <div className="mr-2 flex w-full min-w-0 items-center">
-        <Icon className="mr-2 size-5 shrink-0" icon={folder.icon} />
-        <span className="w-full min-w-0 truncate">{folder.name}</span>
-      </div>
-      <FolderContextMenu folder={folder} isOver={isOver} />
-    </Link>
+      <Flex
+        as={Link}
+        ref={node => {
+          dragRef(node)
+          drop(node)
+        }}
+        justify="between"
+        p="md"
+        position="relative"
+        r="md"
+        shadow
+        style={{
+          ...getStyle({
+            isOver,
+            canDrop,
+            folderColor: folder.color,
+            opacity
+          }),
+          backdropFilter: 'blur(4px)',
+          borderColor: folder.color + '20',
+          cursor: isDragging ? 'move' : undefined,
+          isolation: 'isolate',
+          transition: 'all 150ms'
+        }}
+        to={`/idea-box/${id}/${path}/${folder.id}`.replace('//', '/')}
+      >
+        <Flex align="center" flex="1" minWidth="0" mr="sm">
+          <Icon icon={folder.icon} mr="sm" size="1.25rem" />
+          <Box asChild flex="1" minWidth="0">
+            <Text truncate>{folder.name}</Text>
+          </Box>
+        </Flex>
+        <FolderContextMenu folder={folder} isOver={isOver} />
+      </Flex>
+    </Text>
   )
 }
 

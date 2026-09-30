@@ -1,9 +1,16 @@
-import clsx from 'clsx'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { useModuleTranslation } from '@lifeforge/localization'
-import { Button, Icon, useModalStore } from '@lifeforge/ui'
+import {
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Text,
+  colorWithOpacity,
+  useModalStore
+} from '@lifeforge/ui'
 
 import { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 
@@ -70,75 +77,107 @@ function FAB() {
 
   return !viewArchived ? (
     createPortal(
-      <div
+      <Box
         ref={menuRef}
-        className="group fixed right-6 bottom-6 z-9990 sm:right-12 sm:bottom-12"
+        bottom={{ base: '1.5rem', sm: '3rem' }}
+        position="fixed"
+        right={{ base: '1.5rem', sm: '3rem' }}
+        zIndex="9990"
       >
         <Button
-          className={clsx(
-            'relative z-[9991] shadow-lg',
-            isOpen && 'rotate-45',
-            'transition-all'
-          )}
           icon="tabler:plus"
-          iconClassName={clsx(isOpen && 'rotate-45', 'transition-all')}
+          iconProps={{
+            style: {
+              transform: isOpen ? 'rotate(45deg)' : 'none',
+              transition: 'transform 100ms'
+            }
+          }}
+          position="relative"
+          shadow
+          zIndex="9991"
           onClick={() => setIsOpen(!isOpen)}
         />
-        <div
-          className={clsx(
-            'absolute right-0 bottom-full z-9999 mb-4 rounded-lg outline-hidden transition duration-100 ease-out focus:outline-hidden',
-            isOpen
-              ? 'scale-100 opacity-100'
-              : 'pointer-events-none scale-95 opacity-0'
-          )}
+        <Box
+          bottom="100%"
+          mb="md"
+          position="absolute"
+          r="lg"
+          right="0"
+          style={{
+            opacity: isOpen ? 1 : 0,
+            outline: 'none',
+            pointerEvents: isOpen ? 'auto' : 'none',
+            transform: isOpen ? 'scale(1)' : 'scale(0.95)',
+            transition: 'opacity 100ms ease-out, transform 100ms ease-out'
+          }}
+          zIndex="9999"
         >
           {menuItems.map(([name, icon], index) => (
-            <div
+            <Flex
               key={name}
-              className={clsx(
-                'group flex w-full items-center justify-end gap-3 rounded-md py-2 pr-2 whitespace-nowrap',
-                focusedIndex === index && 'bg-bg-800/50'
-              )}
+              align="center"
+              bg={
+                focusedIndex === index
+                  ? colorWithOpacity('bg-800', '50%')
+                  : undefined
+              }
+              gap="sm"
+              justify="end"
+              pr="sm"
+              py="sm"
+              r="md"
               onMouseEnter={() => setFocusedIndex(index)}
               onMouseLeave={() => setFocusedIndex(null)}
             >
-              <span
-                className={clsx(
-                  'text-bg-50 transition-all',
-                  focusedIndex === index && 'text-bg-200'
-                )}
+              <Text
+                color={focusedIndex === index ? 'bg-200' : 'bg-50'}
+                style={{ transition: 'color 100ms' }}
+                whiteSpace="nowrap"
               >
                 {t(`entryType.${name.toLowerCase()}`)}
-              </span>
-              <button
-                className={clsx(
-                  'bg-bg-100 text-bg-800 rounded-full p-3 transition-all',
-                  focusedIndex === index && 'bg-bg-200'
-                )}
+              </Text>
+              <Flex
+                as="button"
+                centered
+                bg={focusedIndex === index ? 'bg-200' : 'bg-100'}
+                p="sm"
+                r="full"
+                style={{ transition: 'background-color 100ms' }}
+                type="button"
                 onClick={handleEntryCreation(name)}
               >
-                <Icon className="size-5" icon={icon} />
-              </button>
-            </div>
+                <Icon color="bg-800" icon={icon} size="1.25rem" />
+              </Flex>
+            </Flex>
           ))}
-        </div>
-        <div
-          className={clsx(
-            'fixed top-0 left-0 z-[9990] size-full transition-transform',
-            isOpen ? 'translate-x-0 duration-0' : 'translate-x-full delay-100'
-          )}
+        </Box>
+        <Box
+          height="100%"
+          left="0"
+          position="fixed"
+          style={{
+            transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+            transition: isOpen ? 'none' : 'transform 100ms 100ms'
+          }}
+          top="0"
+          width="100%"
+          zIndex="9990"
         >
-          <div
-            className={clsx(
-              'bg-bg-900/50 size-full backdrop-blur-xs transition-opacity',
-              isOpen ? 'opacity-100' : 'opacity-0'
-            )}
+          <Box
+            bg={colorWithOpacity('bg-900', '50%')}
+            height="100%"
+            style={{
+              backdropFilter: 'blur(4px)',
+              opacity: isOpen ? 1 : 0,
+              transition: 'opacity 100ms'
+            }}
+            width="100%"
             onClick={() => {
               setIsOpen(false)
             }}
           />
-        </div>
-      </div>,
+        </Box>
+      </Box>,
       (document.getElementById('app') as HTMLElement) || document.body
     )
   ) : (

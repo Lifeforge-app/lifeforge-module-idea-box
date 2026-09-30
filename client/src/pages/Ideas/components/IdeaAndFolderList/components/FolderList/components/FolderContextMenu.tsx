@@ -84,15 +84,18 @@ function FolderContextMenu({
 
   return (
     <ContextMenu
-      classNames={{
-        button: 'p-2!',
-        wrapper: 'relative z-10',
-        icon: isOver
-          ? tinycolor(folder.color).isDark()
-            ? 'text-bg-100'
-            : 'text-bg-800'
-          : 'text-bg-500'
+      componentProps={{
+        button: { p: 'sm' },
+        icon: {
+          color: isOver
+            ? tinycolor(folder.color).isDark()
+              ? 'bg-100'
+              : 'bg-800'
+            : 'muted'
+        }
       }}
+      position="relative"
+      zIndex="10"
     >
       {folder.parent !== '' && (
         <ContextMenuItem

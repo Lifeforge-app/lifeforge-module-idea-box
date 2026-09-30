@@ -1,10 +1,32 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
+import z from 'zod'
 
-import type { InferInput } from '@lifeforge/api'
-import { FormModal, defineForm, toast } from '@lifeforge/ui'
+import {
+  ColorField,
+  FileField,
+  FormModal,
+  IconField,
+  TextField,
+  convertFormFileFieldData,
+  createDefaultValues,
+  fileValueSchema,
+  getFormFileFieldInitialData,
+  toast
+} from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
 import type { IdeaBoxContainer } from '@/providers/IdeaBoxProvider'
+
+const schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  icon: z.string().min(1, 'Icon is required'),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'),
+  cover: fileValueSchema
+})
 
 function ModifyContainerModal({
   data: { type, initialData },
@@ -42,72 +64,77 @@ function ModifyContainerModal({
     forgeAPI.checkAPIKeys({ keys: 'openai' }).queryOptions()
   )
 
-  const { formProps } = defineForm<
-    InferInput<(typeof forgeAPI.containers)[typeof type]>['body']
-  >({
-    icon: type === 'create' ? 'tabler:plus' : 'tabler:pencil',
-    title: `container.${type}`,
-    onClose,
-    namespace: 'apps.ideaBox',
-    submitButton: type
-  })
-    .typesMap({
-      name: 'text',
-      icon: 'icon',
-      color: 'color',
-      cover: 'file'
-    })
-    .setupFields({
-      name: {
-        required: true,
-        label: 'Container name',
-        icon: 'tabler:cube',
-        placeholder: 'My container'
-      },
-      icon: {
-        required: true,
-        label: 'Container icon'
-      },
-      color: {
-        required: true,
-        label: 'Container color'
-      },
-      cover: {
-        optional: true,
-        required: false,
-        icon: 'tabler:photo',
-        label: 'Cover Image',
-        enablePixabay: true,
-        enableUrl: true,
-        enableAIImageGeneration: imageGenAPIKeyExistsQuery.data ?? false,
-        defaultImageGenerationPrompt: `I have an idea box named "${initialData?.name}", where I store all my ideas related to this title. Generate a thumbnail for the idea box. The image should focus on the title of this idea box instead of the fact that this is the idea box. It should clearly represent the project or whatever the idea box is used to contain the idea for. In other words, do not include any words related to "idea box" in the image unless the title of the box said so.`
-      }
-    })
-    .initialData({
+  const form = useForm({
+    defaultValues: {
+      ...createDefaultValues(schema),
       name: initialData?.name || '',
       icon: initialData?.icon || '',
       color: initialData?.color || '',
-      cover: initialData?.cover
-        ? {
-            file: 'keep',
-            preview: forgeAPI.getMedia({
-              collectionId: initialData.collectionId,
-              recordId: initialData.id,
-              fieldId: initialData.cover,
-              thumb: '0x500'
-            })
-          }
-        : {
-            file: null,
-            preview: null
-          }
-    })
-    .onSubmit(async data => {
-      await mutation.mutateAsync(data)
-    })
-    .build()
+      cover: getFormFileFieldInitialData(
+        forgeAPI,
+        initialData,
+        initialData?.cover
+      )
+    },
+    resolver: zodResolver(schema)
+  })
 
-  return <FormModal {...formProps} />
+  return (
+    <FormModal
+      form={form}
+      submissionConfig={{
+        template: type,
+        handler: async formData => {
+          await mutation.mutateAsync({
+            ...formData,
+            cover: convertFormFileFieldData(formData.cover)
+          })
+        }
+      }}
+      uiConfig={{
+        icon: type === 'create' ? 'tabler:plus' : 'tabler:pencil',
+        title: `container.${type}`,
+        namespace: 'apps.ideaBox',
+        onClose
+      }}
+    >
+      <TextField
+        required
+        control={form.control}
+        icon="tabler:cube"
+        label="containerName"
+        name="name"
+        placeholder="My container"
+      />
+      <IconField
+        required
+        control={form.control}
+        label="containerIcon"
+        name="icon"
+      />
+      <ColorField
+        required
+        control={form.control}
+        label="containerColor"
+        name="color"
+      />
+      <FileField
+        control={form.control}
+        icon="tabler:photo"
+        label="coverImage"
+        name="cover"
+        sources={{
+          pixabay: true,
+          url: true,
+          ai: imageGenAPIKeyExistsQuery.data
+            ? {
+                defaultPrompt: `I have an idea box named "${initialData?.name}", where I store all my ideas related to this title. Generate a thumbnail for the idea box. The image should focus on the title of this idea box instead of the fact that this is the idea box. It should clearly represent the project or whatever the idea box is used to contain the idea for. In other words, do not include any words related to "idea box" in the image unless the title of the box said so.`
+              }
+            : false
+        }}
+      />
+    </FormModal>
+  )
 }
 
 export default ModifyContainerModal
