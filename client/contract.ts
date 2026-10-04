@@ -16,20 +16,20 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "name": {
+              "type": "string"
+            },
             "icon": {
               "type": "string"
             },
             "color": {
               "type": "string"
-            },
-            "name": {
-              "type": "string"
             }
           },
           "required": [
+            "name",
             "icon",
-            "color",
-            "name"
+            "color"
           ],
           "additionalProperties": false
         }
@@ -39,13 +39,18 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
             "icon": {
               "type": "string"
             },
             "color": {
-              "type": "string"
-            },
-            "name": {
               "type": "string"
             },
             "cover": {
@@ -56,27 +61,16 @@ export const contract = {
             },
             "hidden": {
               "type": "boolean"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
+            "name",
             "icon",
             "color",
-            "name",
             "cover",
             "pinned",
-            "hidden",
-            "id",
-            "collectionId",
-            "collectionName"
+            "hidden"
           ],
           "additionalProperties": false
         }
@@ -108,13 +102,18 @@ export const contract = {
           "items": {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
               "name": {
                 "type": "string"
               },
-              "color": {
+              "icon": {
                 "type": "string"
               },
-              "icon": {
+              "color": {
                 "type": "string"
               },
               "cover": {
@@ -134,30 +133,19 @@ export const contract = {
               },
               "image_count": {
                 "type": "number"
-              },
-              "id": {
-                "type": "string"
-              },
-              "collectionId": {
-                "type": "string"
-              },
-              "collectionName": {
-                "type": "string"
               }
             },
             "required": [
+              "id",
               "name",
-              "color",
               "icon",
+              "color",
               "cover",
               "pinned",
               "hidden",
               "text_count",
               "link_count",
-              "image_count",
-              "id",
-              "collectionId",
-              "collectionName"
+              "image_count"
             ],
             "additionalProperties": false
           }
@@ -187,8 +175,7 @@ export const contract = {
         }
       },
       "output": {
-        "NO_CONTENT": true,
-        "NOT_FOUND": true
+        "NO_CONTENT": true
       }
     },
     "toggleHide": {
@@ -218,13 +205,18 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
             "icon": {
               "type": "string"
             },
             "color": {
-              "type": "string"
-            },
-            "name": {
               "type": "string"
             },
             "cover": {
@@ -235,31 +227,19 @@ export const contract = {
             },
             "hidden": {
               "type": "boolean"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
+            "name",
             "icon",
             "color",
-            "name",
             "cover",
             "pinned",
-            "hidden",
-            "id",
-            "collectionId",
-            "collectionName"
+            "hidden"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "togglePin": {
@@ -289,13 +269,18 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
             "icon": {
               "type": "string"
             },
             "color": {
-              "type": "string"
-            },
-            "name": {
               "type": "string"
             },
             "cover": {
@@ -306,31 +291,19 @@ export const contract = {
             },
             "hidden": {
               "type": "boolean"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
+            "name",
             "icon",
             "color",
-            "name",
             "cover",
             "pinned",
-            "hidden",
-            "id",
-            "collectionId",
-            "collectionName"
+            "hidden"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "update": {
@@ -362,20 +335,20 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "name": {
+              "type": "string"
+            },
             "icon": {
               "type": "string"
             },
             "color": {
               "type": "string"
-            },
-            "name": {
-              "type": "string"
             }
           },
           "required": [
+            "name",
             "icon",
-            "color",
-            "name"
+            "color"
           ],
           "additionalProperties": false
         }
@@ -385,13 +358,18 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "type": "string"
+            },
             "icon": {
               "type": "string"
             },
             "color": {
-              "type": "string"
-            },
-            "name": {
               "type": "string"
             },
             "cover": {
@@ -402,31 +380,19 @@ export const contract = {
             },
             "hidden": {
               "type": "boolean"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
+            "name",
             "icon",
             "color",
-            "name",
             "cover",
             "pinned",
-            "hidden",
-            "id",
-            "collectionId",
-            "collectionName"
+            "hidden"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "validate": {
@@ -492,8 +458,7 @@ export const contract = {
             "container",
             "name",
             "color",
-            "icon",
-            "parent"
+            "icon"
           ],
           "additionalProperties": false
         }
@@ -503,6 +468,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "container": {
               "type": "string"
             },
@@ -517,30 +487,18 @@ export const contract = {
             },
             "parent": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
             "container",
             "name",
             "color",
             "icon",
-            "parent",
-            "id",
-            "collectionId",
-            "collectionName"
+            "parent"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "list": {
@@ -576,6 +534,11 @@ export const contract = {
           "items": {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
               "container": {
                 "type": "string"
               },
@@ -590,35 +553,19 @@ export const contract = {
               },
               "parent": {
                 "type": "string"
-              },
-              "id": {
-                "type": "string"
-              },
-              "collectionId": {
-                "type": "string"
-              },
-              "collectionName": {
-                "type": "string"
               }
             },
             "required": [
+              "id",
               "container",
               "name",
               "color",
               "icon",
-              "parent",
-              "id",
-              "collectionId",
-              "collectionName"
+              "parent"
             ],
             "additionalProperties": false
           }
-        },
-        "BAD_REQUEST": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "string"
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "moveTo": {
@@ -661,6 +608,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "container": {
               "type": "string"
             },
@@ -675,30 +627,18 @@ export const contract = {
             },
             "parent": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
             "container",
             "name",
             "color",
             "icon",
-            "parent",
-            "id",
-            "collectionId",
-            "collectionName"
+            "parent"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "remove": {
@@ -724,8 +664,7 @@ export const contract = {
         }
       },
       "output": {
-        "NO_CONTENT": true,
-        "NOT_FOUND": true
+        "NO_CONTENT": true
       }
     },
     "removeFromParent": {
@@ -755,6 +694,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "container": {
               "type": "string"
             },
@@ -769,34 +713,18 @@ export const contract = {
             },
             "parent": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
             "container",
             "name",
             "color",
             "icon",
-            "parent",
-            "id",
-            "collectionId",
-            "collectionName"
+            "parent"
           ],
           "additionalProperties": false
-        },
-        "BAD_REQUEST": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "string"
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "update": {
@@ -847,6 +775,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "container": {
               "type": "string"
             },
@@ -861,30 +794,18 @@ export const contract = {
             },
             "parent": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
             "container",
             "name",
             "color",
             "icon",
-            "parent",
-            "id",
-            "collectionId",
-            "collectionName"
+            "parent"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     }
   },
@@ -916,6 +837,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "type": {
               "type": "string",
               "enum": [
@@ -936,24 +862,23 @@ export const contract = {
             "archived": {
               "type": "boolean"
             },
-            "tags": {},
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "created": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             },
             "updated": {
-              "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             }
           },
           "required": [
+            "id",
             "type",
             "container",
             "folder",
@@ -961,14 +886,10 @@ export const contract = {
             "archived",
             "tags",
             "created",
-            "updated",
-            "id",
-            "collectionId",
-            "collectionName"
+            "updated"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "create": {
@@ -985,72 +906,95 @@ export const contract = {
       "input": {
         "body": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "allOf": [
+          "oneOf": [
             {
               "type": "object",
               "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "text"
+                },
                 "container": {
                   "type": "string"
                 },
                 "folder": {
                   "type": "string"
                 },
-                "tags": {}
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "content": {
+                  "type": "string"
+                }
               },
               "required": [
+                "type",
                 "container",
-                "folder",
-                "tags"
-              ]
+                "tags",
+                "content"
+              ],
+              "additionalProperties": false
             },
             {
-              "anyOf": [
-                {
-                  "type": "object",
-                  "properties": {
-                    "content": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string",
-                      "const": "text"
-                    }
-                  },
-                  "required": [
-                    "content",
-                    "type"
-                  ]
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "image"
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "const": "image"
-                    }
-                  },
-                  "required": [
-                    "type"
-                  ]
+                "container": {
+                  "type": "string"
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "link": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "type": {
-                      "type": "string",
-                      "const": "link"
-                    }
-                  },
-                  "required": [
-                    "link",
-                    "type"
-                  ]
+                "folder": {
+                  "type": "string"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
-              ]
+              },
+              "required": [
+                "type",
+                "container",
+                "tags"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "link"
+                },
+                "container": {
+                  "type": "string"
+                },
+                "folder": {
+                  "type": "string"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "link": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "container",
+                "tags",
+                "link"
+              ],
+              "additionalProperties": false
             }
           ]
         }
@@ -1060,6 +1004,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "type": {
               "type": "string",
               "enum": [
@@ -1080,24 +1029,23 @@ export const contract = {
             "archived": {
               "type": "boolean"
             },
-            "tags": {},
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "created": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             },
             "updated": {
-              "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             }
           },
           "required": [
+            "id",
             "type",
             "container",
             "folder",
@@ -1105,18 +1053,10 @@ export const contract = {
             "archived",
             "tags",
             "created",
-            "updated",
-            "id",
-            "collectionId",
-            "collectionName"
+            "updated"
           ],
           "additionalProperties": false
-        },
-        "BAD_REQUEST": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "string"
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "list": {
@@ -1153,10 +1093,19 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "array",
           "items": {
-            "allOf": [
+            "oneOf": [
               {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "type": {
+                    "type": "string",
+                    "const": "text"
+                  },
                   "container": {
                     "type": "string"
                   },
@@ -1169,24 +1118,27 @@ export const contract = {
                   "archived": {
                     "type": "boolean"
                   },
-                  "tags": {},
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
                   "created": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time"
                   },
                   "updated": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "date-time"
                   },
-                  "id": {
-                    "type": "string"
-                  },
-                  "collectionId": {
-                    "type": "string"
-                  },
-                  "collectionName": {
+                  "content": {
                     "type": "string"
                   }
                 },
                 "required": [
+                  "id",
+                  "type",
                   "container",
                   "folder",
                   "pinned",
@@ -1194,136 +1146,125 @@ export const contract = {
                   "tags",
                   "created",
                   "updated",
-                  "id",
-                  "collectionId",
-                  "collectionName"
-                ]
+                  "content"
+                ],
+                "additionalProperties": false
               },
               {
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "properties": {
-                      "base_entry": {
-                        "type": "string"
-                      },
-                      "content": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
-                      },
-                      "collectionId": {
-                        "type": "string"
-                      },
-                      "collectionName": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string",
-                        "const": "text"
-                      }
-                    },
-                    "required": [
-                      "base_entry",
-                      "content",
-                      "id",
-                      "collectionId",
-                      "collectionName",
-                      "type"
-                    ]
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "image": {
-                        "type": "string"
-                      },
-                      "base_entry": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
-                      },
-                      "collectionId": {
-                        "type": "string"
-                      },
-                      "collectionName": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string",
-                        "const": "image"
-                      },
-                      "child": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "collectionId": {
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "collectionId"
-                        ]
-                      }
-                    },
-                    "required": [
-                      "image",
-                      "base_entry",
-                      "id",
-                      "collectionId",
-                      "collectionName",
-                      "type",
-                      "child"
-                    ]
+                  "type": {
+                    "type": "string",
+                    "const": "image"
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "link": {
-                        "type": "string",
-                        "format": "uri"
-                      },
-                      "base_entry": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
-                      },
-                      "collectionId": {
-                        "type": "string"
-                      },
-                      "collectionName": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string",
-                        "const": "link"
-                      }
-                    },
-                    "required": [
-                      "link",
-                      "base_entry",
-                      "id",
-                      "collectionId",
-                      "collectionName",
-                      "type"
-                    ]
+                  "container": {
+                    "type": "string"
+                  },
+                  "folder": {
+                    "type": "string"
+                  },
+                  "pinned": {
+                    "type": "boolean"
+                  },
+                  "archived": {
+                    "type": "boolean"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "created": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "image": {
+                    "type": "string"
                   }
-                ]
+                },
+                "required": [
+                  "id",
+                  "type",
+                  "container",
+                  "folder",
+                  "pinned",
+                  "archived",
+                  "tags",
+                  "created",
+                  "updated",
+                  "image"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "type": {
+                    "type": "string",
+                    "const": "link"
+                  },
+                  "container": {
+                    "type": "string"
+                  },
+                  "folder": {
+                    "type": "string"
+                  },
+                  "pinned": {
+                    "type": "boolean"
+                  },
+                  "archived": {
+                    "type": "boolean"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "created": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "link": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "type",
+                  "container",
+                  "folder",
+                  "pinned",
+                  "archived",
+                  "tags",
+                  "created",
+                  "updated",
+                  "link"
+                ],
+                "additionalProperties": false
               }
             ]
           }
-        },
-        "BAD_REQUEST": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "string"
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "moveTo": {
@@ -1362,8 +1303,7 @@ export const contract = {
         }
       },
       "output": {
-        "NO_CONTENT": true,
-        "NOT_FOUND": true
+        "NO_CONTENT": true
       }
     },
     "pin": {
@@ -1393,6 +1333,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "type": {
               "type": "string",
               "enum": [
@@ -1413,24 +1358,23 @@ export const contract = {
             "archived": {
               "type": "boolean"
             },
-            "tags": {},
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "created": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             },
             "updated": {
-              "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             }
           },
           "required": [
+            "id",
             "type",
             "container",
             "folder",
@@ -1438,14 +1382,10 @@ export const contract = {
             "archived",
             "tags",
             "created",
-            "updated",
-            "id",
-            "collectionId",
-            "collectionName"
+            "updated"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "remove": {
@@ -1471,8 +1411,7 @@ export const contract = {
         }
       },
       "output": {
-        "NO_CONTENT": true,
-        "NOT_FOUND": true
+        "NO_CONTENT": true
       }
     },
     "removeFromParent": {
@@ -1498,12 +1437,7 @@ export const contract = {
         }
       },
       "output": {
-        "NO_CONTENT": true,
-        "BAD_REQUEST": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "string"
-        },
-        "NOT_FOUND": true
+        "NO_CONTENT": true
       }
     },
     "update": {
@@ -1533,64 +1467,74 @@ export const contract = {
         },
         "body": {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "allOf": [
+          "oneOf": [
             {
               "type": "object",
               "properties": {
-                "tags": {}
+                "type": {
+                  "type": "string",
+                  "const": "text"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "content": {
+                  "type": "string"
+                }
               },
               "required": [
-                "tags"
-              ]
+                "type",
+                "tags",
+                "content"
+              ],
+              "additionalProperties": false
             },
             {
-              "anyOf": [
-                {
-                  "type": "object",
-                  "properties": {
-                    "content": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string",
-                      "const": "text"
-                    }
-                  },
-                  "required": [
-                    "content",
-                    "type"
-                  ]
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "image"
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "const": "image"
-                    }
-                  },
-                  "required": [
-                    "type"
-                  ]
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "link": {
-                      "type": "string",
-                      "format": "uri"
-                    },
-                    "type": {
-                      "type": "string",
-                      "const": "link"
-                    }
-                  },
-                  "required": [
-                    "link",
-                    "type"
-                  ]
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
-              ]
+              },
+              "required": [
+                "type",
+                "tags"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "link"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "link": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "tags",
+                "link"
+              ],
+              "additionalProperties": false
             }
           ]
         }
@@ -1600,6 +1544,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "type": {
               "type": "string",
               "enum": [
@@ -1620,24 +1569,23 @@ export const contract = {
             "archived": {
               "type": "boolean"
             },
-            "tags": {},
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "created": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             },
             "updated": {
-              "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             }
           },
           "required": [
+            "id",
             "type",
             "container",
             "folder",
@@ -1645,18 +1593,10 @@ export const contract = {
             "archived",
             "tags",
             "created",
-            "updated",
-            "id",
-            "collectionId",
-            "collectionName"
+            "updated"
           ],
           "additionalProperties": false
-        },
-        "BAD_REQUEST": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "string"
-        },
-        "NOT_FOUND": true
+        }
       }
     }
   },
@@ -1700,6 +1640,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "name": {
               "type": "string"
             },
@@ -1711,29 +1656,17 @@ export const contract = {
             },
             "container": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
             "name",
             "icon",
             "color",
-            "container",
-            "id",
-            "collectionId",
-            "collectionName"
+            "container"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "list": {
@@ -1765,13 +1698,18 @@ export const contract = {
           "items": {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
               "name": {
                 "type": "string"
               },
-              "color": {
+              "icon": {
                 "type": "string"
               },
-              "icon": {
+              "color": {
                 "type": "string"
               },
               "container": {
@@ -1779,31 +1717,19 @@ export const contract = {
               },
               "amount": {
                 "type": "number"
-              },
-              "id": {
-                "type": "string"
-              },
-              "collectionId": {
-                "type": "string"
-              },
-              "collectionName": {
-                "type": "string"
               }
             },
             "required": [
-              "name",
-              "color",
-              "icon",
-              "container",
-              "amount",
               "id",
-              "collectionId",
-              "collectionName"
+              "name",
+              "icon",
+              "color",
+              "container",
+              "amount"
             ],
             "additionalProperties": false
           }
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "remove": {
@@ -1829,8 +1755,7 @@ export const contract = {
         }
       },
       "output": {
-        "NO_CONTENT": true,
-        "NOT_FOUND": true
+        "NO_CONTENT": true
       }
     },
     "update": {
@@ -1881,6 +1806,11 @@ export const contract = {
           "$schema": "https://json-schema.org/draft/2020-12/schema",
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
             "name": {
               "type": "string"
             },
@@ -1892,29 +1822,17 @@ export const contract = {
             },
             "container": {
               "type": "string"
-            },
-            "id": {
-              "type": "string"
-            },
-            "collectionId": {
-              "type": "string"
-            },
-            "collectionName": {
-              "type": "string"
             }
           },
           "required": [
+            "id",
             "name",
             "icon",
             "color",
-            "container",
-            "id",
-            "collectionId",
-            "collectionName"
+            "container"
           ],
           "additionalProperties": false
-        },
-        "NOT_FOUND": true
+        }
       }
     }
   },
@@ -1976,9 +1894,45 @@ export const contract = {
       },
       "output": {
         "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema"
-        },
-        "NOT_FOUND": true
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "ogTitle": {
+              "type": "string"
+            },
+            "ogDescription": {
+              "type": "string"
+            },
+            "ogSiteName": {
+              "type": "string"
+            },
+            "ogImage": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "type": "number"
+                  },
+                  "height": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
       }
     },
     "getPath": {
@@ -2014,13 +1968,18 @@ export const contract = {
             "container": {
               "type": "object",
               "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "name": {
+                  "type": "string"
+                },
                 "icon": {
                   "type": "string"
                 },
                 "color": {
-                  "type": "string"
-                },
-                "name": {
                   "type": "string"
                 },
                 "cover": {
@@ -2031,27 +1990,16 @@ export const contract = {
                 },
                 "hidden": {
                   "type": "boolean"
-                },
-                "id": {
-                  "type": "string"
-                },
-                "collectionId": {
-                  "type": "string"
-                },
-                "collectionName": {
-                  "type": "string"
                 }
               },
               "required": [
+                "id",
+                "name",
                 "icon",
                 "color",
-                "name",
                 "cover",
                 "pinned",
-                "hidden",
-                "id",
-                "collectionId",
-                "collectionName"
+                "hidden"
               ],
               "additionalProperties": false
             },
@@ -2060,6 +2008,11 @@ export const contract = {
               "items": {
                 "type": "object",
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
                   "container": {
                     "type": "string"
                   },
@@ -2074,26 +2027,15 @@ export const contract = {
                   },
                   "parent": {
                     "type": "string"
-                  },
-                  "id": {
-                    "type": "string"
-                  },
-                  "collectionId": {
-                    "type": "string"
-                  },
-                  "collectionName": {
-                    "type": "string"
                   }
                 },
                 "required": [
+                  "id",
                   "container",
                   "name",
                   "color",
                   "icon",
-                  "parent",
-                  "id",
-                  "collectionId",
-                  "collectionName"
+                  "parent"
                 ],
                 "additionalProperties": false
               }
@@ -2104,12 +2046,7 @@ export const contract = {
             "route"
           ],
           "additionalProperties": false
-        },
-        "BAD_REQUEST": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "string"
-        },
-        "NOT_FOUND": true
+        }
       }
     },
     "search": {
@@ -2151,6 +2088,11 @@ export const contract = {
           "items": {
             "type": "object",
             "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
               "type": {
                 "type": "string",
                 "const": "text"
@@ -2167,21 +2109,19 @@ export const contract = {
               "archived": {
                 "type": "boolean"
               },
-              "tags": {},
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
               "created": {
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               "updated": {
-                "type": "string"
-              },
-              "id": {
-                "type": "string"
-              },
-              "collectionId": {
-                "type": "string"
-              },
-              "collectionName": {
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               "content": {
                 "type": "string"
@@ -2195,6 +2135,11 @@ export const contract = {
                   "folder": {
                     "type": "object",
                     "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
                       "container": {
                         "type": "string"
                       },
@@ -2209,26 +2154,15 @@ export const contract = {
                       },
                       "parent": {
                         "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
-                      },
-                      "collectionId": {
-                        "type": "string"
-                      },
-                      "collectionName": {
-                        "type": "string"
                       }
                     },
                     "required": [
+                      "id",
                       "container",
                       "name",
                       "color",
                       "icon",
-                      "parent",
-                      "id",
-                      "collectionId",
-                      "collectionName"
+                      "parent"
                     ],
                     "additionalProperties": false
                   }
@@ -2237,6 +2171,7 @@ export const contract = {
               }
             },
             "required": [
+              "id",
               "type",
               "container",
               "folder",
@@ -2245,17 +2180,13 @@ export const contract = {
               "tags",
               "created",
               "updated",
-              "id",
-              "collectionId",
-              "collectionName",
               "content",
               "fullPath",
               "expand"
             ],
             "additionalProperties": false
           }
-        },
-        "NOT_FOUND": true
+        }
       }
     }
   }

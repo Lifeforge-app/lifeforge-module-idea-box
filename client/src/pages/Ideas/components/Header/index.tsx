@@ -17,7 +17,7 @@ function Header() {
     forgeAPI.misc.getPath
       .input({
         container: id || '',
-        folder: path?.split('/').pop() ?? undefined
+        folder: path ? path.split('/').pop() : undefined
       })
       .queryOptions({
         enabled: id !== undefined && pathValid
@@ -45,9 +45,7 @@ function Header() {
           backgroundImage:
             pathDetails?.container.cover &&
             `url(${forgeAPI.getMedia({
-              collectionId: pathDetails.container.collectionId,
-              recordId: pathDetails.container.id,
-              fieldId: pathDetails.container.cover
+              key: pathDetails.container.cover
             })})`,
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

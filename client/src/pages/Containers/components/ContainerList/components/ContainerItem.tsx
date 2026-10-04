@@ -139,9 +139,7 @@ function ContainerItem({ container }: { container: IdeaBoxContainer }) {
           <img
             alt=""
             src={forgeAPI.getMedia({
-              collectionId: container.collectionId,
-              recordId: container.id,
-              fieldId: container.cover,
+              key: container.cover,
               thumb: '0x300'
             })}
             style={{

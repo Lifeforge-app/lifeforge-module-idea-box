@@ -1,6 +1,6 @@
 import { useParams } from 'react-router'
 
-import { Box, SearchInput } from '@lifeforge/ui'
+import { SearchInput } from '@lifeforge/ui'
 
 import IdeaBoxProvider, { useIdeaBoxContext } from '@/providers/IdeaBoxProvider'
 

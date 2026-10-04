@@ -1,7 +1,26 @@
+import { and, asc, desc, eq, sql } from 'drizzle-orm'
+import { createSelectSchema } from 'drizzle-orm/zod'
 import z from 'zod'
 
 import forge from '../forge'
-import ideaBoxSchemas from '../schema'
+import {
+  ideaBoxContainers,
+  ideaBoxEntries
+} from '../schema.drizzle'
+
+const containerDto = createSelectSchema(ideaBoxContainers)
+
+const containerAggregateDto = containerDto.extend({
+  text_count: z.number(),
+  link_count: z.number(),
+  image_count: z.number()
+})
+
+const containerInputDto = z.object({
+  name: z.string(),
+  icon: z.string(),
+  color: z.string()
+})
 
 export const validate = forge
   .query({
@@ -15,15 +34,11 @@ export const validate = forge
       OK: z.boolean()
     }
   })
-  .callback(async ({ pb, query: { id }, response }) =>
-    response.ok(
-      !!(await pb.getOne
-        .collection('containers')
-        .id(id)
-        .execute()
-        .catch(() => {}))
-    )
-  )
+  .callback(async ({ db, query: { id }, response }) => {
+    const container = await db.query.containers.findFirst({ where: { id } })
+
+    return response.ok(!!container)
+  })
 
 export const list = forge
   .query({
@@ -34,41 +49,49 @@ export const list = forge
       })
     },
     output: {
-      OK: z.array(ideaBoxSchemas.containers_aggregated)
+      OK: z.array(containerAggregateDto)
     }
   })
-  .callback(async ({ pb, query: { hidden }, response }) => {
+  .callback(async ({ db, query: { hidden }, response }) => {
     const parsedHidden = hidden === 'true'
 
-    return response.ok(
-      await pb.getFullList
-        .collection('containers_aggregated')
-        .filter([
-          !parsedHidden
-            ? {
-                field: 'hidden',
-                operator: '=',
-                value: false
-              }
-            : undefined
-        ])
-        .sort(['hidden', '-pinned', 'name'])
-        .execute()
-    )
+    const rows = await db
+      .select({
+        id: ideaBoxContainers.id,
+        name: ideaBoxContainers.name,
+        icon: ideaBoxContainers.icon,
+        color: ideaBoxContainers.color,
+        cover: ideaBoxContainers.cover,
+        pinned: ideaBoxContainers.pinned,
+        hidden: ideaBoxContainers.hidden,
+        text_count: sql<number>`CAST(count(CASE WHEN ${ideaBoxEntries.type} = 'text' THEN 1 END) AS INTEGER)`,
+        link_count: sql<number>`CAST(count(CASE WHEN ${ideaBoxEntries.type} = 'link' THEN 1 END) AS INTEGER)`,
+        image_count: sql<number>`CAST(count(CASE WHEN ${ideaBoxEntries.type} = 'image' THEN 1 END) AS INTEGER)`
+      })
+      .from(ideaBoxContainers)
+      .leftJoin(
+        ideaBoxEntries,
+        and(
+          eq(ideaBoxEntries.container, ideaBoxContainers.id),
+          eq(ideaBoxEntries.archived, false)
+        )
+      )
+      .where(parsedHidden ? undefined : eq(ideaBoxContainers.hidden, false))
+      .groupBy(ideaBoxContainers.id)
+      .orderBy(
+        asc(ideaBoxContainers.hidden),
+        desc(ideaBoxContainers.pinned),
+        asc(ideaBoxContainers.name)
+      )
+
+    return response.ok(rows)
   })
 
 export const create = forge
   .mutation({
     description: 'Create a new container',
     input: {
-      body: ideaBoxSchemas.containers.omit({
-        cover: true,
-        hidden: true,
-        pinned: true,
-        collectionId: true,
-        collectionName: true,
-        id: true
-      })
+      body: containerInputDto
     },
     media: {
       cover: {
@@ -76,28 +99,37 @@ export const create = forge
       }
     },
     output: {
-      CREATED: ideaBoxSchemas.containers
+      CREATED: containerDto
     }
   })
   .callback(
     async ({
-      pb,
+      db,
       body,
       media: { cover },
-      core: {
-        media: { retrieveMedia }
-      },
+      core: { storage },
       response
-    }) =>
-      response.created(
-        await pb.create
-          .collection('containers')
-          .data({
-            ...body,
-            ...(await retrieveMedia('cover', cover))
-          })
-          .execute()
-      )
+    }) => {
+      let coverKey = ''
+
+      if (cover && typeof cover !== 'string') {
+        const ref = await storage.save({ file: cover, thumbs: ['0x300'] })
+
+        coverKey = ref?.key ?? ''
+      }
+
+      const [created] = await db
+        .insert(ideaBoxContainers)
+        .values({
+          name: body.name,
+          icon: body.icon,
+          color: body.color,
+          cover: coverKey
+        })
+        .returning()
+
+      return response.created(created)
+    }
   )
 
 export const update = forge
@@ -105,51 +137,51 @@ export const update = forge
     description: 'Update an existing container',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxContainers)
       }),
-      body: ideaBoxSchemas.containers.omit({
-        cover: true,
-        hidden: true,
-        pinned: true,
-        collectionId: true,
-        collectionName: true,
-        id: true
-      })
+      body: containerInputDto
     },
     media: {
       cover: {
         optional: true
       }
     },
-    existenceCheck: {
-      query: { id: 'containers' }
-    },
     output: {
-      OK: ideaBoxSchemas.containers,
-      NOT_FOUND: true
+      OK: containerDto
     }
   })
   .callback(
     async ({
-      pb,
+      db,
       query: { id },
       body,
       media: { cover },
-      core: {
-        media: { retrieveMedia }
-      },
+      core: { storage },
       response
-    }) =>
-      response.ok(
-        await pb.update
-          .collection('containers')
-          .id(id)
-          .data({
-            ...body,
-            ...(await retrieveMedia('cover', cover))
-          })
-          .execute()
-      )
+    }) => {
+      const coverUpdate: { cover?: string } = {}
+
+      if (cover === 'removed') {
+        coverUpdate.cover = ''
+      } else if (cover && typeof cover !== 'string') {
+        const ref = await storage.save({ file: cover, thumbs: ['0x300'] })
+
+        coverUpdate.cover = ref?.key ?? ''
+      }
+
+      const [updated] = await db
+        .update(ideaBoxContainers)
+        .set({
+          name: body.name,
+          icon: body.icon,
+          color: body.color,
+          ...coverUpdate
+        })
+        .where(eq(ideaBoxContainers.id, id))
+        .returning()
+
+      return response.ok(updated)
+    }
   )
 
 export const remove = forge
@@ -157,19 +189,15 @@ export const remove = forge
     description: 'Delete a container',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxContainers)
       })
     },
-    existenceCheck: {
-      query: { id: 'containers' }
-    },
     output: {
-      NO_CONTENT: true,
-      NOT_FOUND: true
+      NO_CONTENT: true
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    await pb.delete.collection('containers').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    await db.delete(ideaBoxContainers).where(eq(ideaBoxContainers.id, id))
 
     return response.noContent()
   })
@@ -179,29 +207,25 @@ export const togglePin = forge
     description: 'Toggle pin status of a container',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxContainers)
       })
     },
-    existenceCheck: {
-      query: { id: 'containers' }
-    },
     output: {
-      OK: ideaBoxSchemas.containers,
-      NOT_FOUND: true
+      OK: containerDto
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    const container = await pb.getOne.collection('containers').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    const container = (await db.query.containers.findFirst({
+      where: { id }
+    }))!
 
-    return response.ok(
-      await pb.update
-        .collection('containers')
-        .id(id)
-        .data({
-          pinned: !container.pinned
-        })
-        .execute()
-    )
+    const [updated] = await db
+      .update(ideaBoxContainers)
+      .set({ pinned: !container.pinned })
+      .where(eq(ideaBoxContainers.id, id))
+      .returning()
+
+    return response.ok(updated)
   })
 
 export const toggleHide = forge
@@ -209,28 +233,23 @@ export const toggleHide = forge
     description: 'Toggle visibility of a container',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxContainers)
       })
     },
-    existenceCheck: {
-      query: { id: 'containers' }
-    },
     output: {
-      OK: ideaBoxSchemas.containers,
-      NOT_FOUND: true
+      OK: containerDto
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    const container = await pb.getOne.collection('containers').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    const container = (await db.query.containers.findFirst({
+      where: { id }
+    }))!
 
-    return response.ok(
-      await pb.update
-        .collection('containers')
-        .id(id)
-        .data({
-          hidden: !container.hidden,
-          pinned: false
-        })
-        .execute()
-    )
+    const [updated] = await db
+      .update(ideaBoxContainers)
+      .set({ hidden: !container.hidden, pinned: false })
+      .where(eq(ideaBoxContainers.id, id))
+      .returning()
+
+    return response.ok(updated)
   })

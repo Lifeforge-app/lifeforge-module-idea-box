@@ -1,106 +1,138 @@
+import { and, eq } from 'drizzle-orm'
+import { createSelectSchema } from 'drizzle-orm/zod'
 import z from 'zod'
 
 import forge from '../forge'
-import ideaBoxSchemas from '../schema'
+import {
+  ideaBoxContainers,
+  ideaBoxEntries,
+  ideaBoxTags
+} from '../schema.drizzle'
+
+const tagDto = createSelectSchema(ideaBoxTags).extend({
+  container: z.string()
+})
+
+const tagAggregateDto = tagDto.extend({
+  amount: z.number()
+})
+
+function serializeTag(row: typeof ideaBoxTags.$inferSelect) {
+  return {
+    ...row,
+    container: row.container ?? ''
+  }
+}
 
 export const list = forge
   .query({
     description: 'Get all tags in a container',
     input: {
       query: z.object({
-        container: z.string()
+        container: forge.existsIn(z.string(), ideaBoxContainers)
       })
     },
-    existenceCheck: {
-      query: { container: 'containers' }
-    },
     output: {
-      OK: z.array(ideaBoxSchemas.tags_aggregated),
-      NOT_FOUND: true
+      OK: z.array(tagAggregateDto)
     }
   })
-  .callback(async ({ pb, query: { container }, response }) =>
-    response.ok(
-      await pb.getFullList
-        .collection('tags_aggregated')
-        .filter([
-          {
-            field: 'container',
-            operator: '=',
-            value: container
-          }
-        ])
-        .sort(['-amount'])
-        .execute()
-    )
-  )
+  .callback(async ({ db, query: { container }, response }) => {
+    const [tags, entries] = await Promise.all([
+      db
+        .select()
+        .from(ideaBoxTags)
+        .where(eq(ideaBoxTags.container, container)),
+      db
+        .select({ tags: ideaBoxEntries.tags })
+        .from(ideaBoxEntries)
+        .where(
+          and(
+            eq(ideaBoxEntries.container, container),
+            eq(ideaBoxEntries.archived, false)
+          )
+        )
+    ])
+
+    const counts = new Map<string, number>()
+
+    for (const entry of entries) {
+      for (const tag of entry.tags) {
+        counts.set(tag, (counts.get(tag) ?? 0) + 1)
+      }
+    }
+
+    const rows = tags
+      .map(tag => ({
+        ...serializeTag(tag),
+        amount: counts.get(tag.name) ?? 0
+      }))
+      .sort((a, b) => b.amount - a.amount)
+
+    return response.ok(rows)
+  })
 
 export const create = forge
   .mutation({
     description: 'Create a new tag',
     input: {
-      body: ideaBoxSchemas.tags.omit({
-        collectionId: true,
-        collectionName: true,
-        id: true
+      body: z.object({
+        name: z.string(),
+        icon: z.string(),
+        color: z.string(),
+        container: forge.existsIn(z.string(), ideaBoxContainers)
       })
     },
-    existenceCheck: {
-      query: { container: 'containers' }
-    },
     output: {
-      CREATED: ideaBoxSchemas.tags,
-      NOT_FOUND: true
+      CREATED: tagDto
     }
   })
-  .callback(async ({ pb, body, response }) =>
-    response.created(await pb.create.collection('tags').data(body).execute())
-  )
+  .callback(async ({ db, body, response }) => {
+    const [created] = await db.insert(ideaBoxTags).values(body).returning()
+
+    return response.created(serializeTag(created))
+  })
 
 export const update = forge
   .mutation({
     description: 'Update an existing tag',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxTags)
       }),
-      body: ideaBoxSchemas.tags.omit({
-        container: true,
-        collectionId: true,
-        collectionName: true,
-        id: true
+      body: z.object({
+        name: z.string(),
+        icon: z.string(),
+        color: z.string()
       })
     },
-    existenceCheck: {
-      query: { id: 'tags' }
-    },
     output: {
-      OK: ideaBoxSchemas.tags,
-      NOT_FOUND: true
+      OK: tagDto
     }
   })
-  .callback(async ({ pb, query: { id }, body, response }) =>
-    response.ok(await pb.update.collection('tags').id(id).data(body).execute())
-  )
+  .callback(async ({ db, query: { id }, body, response }) => {
+    const [updated] = await db
+      .update(ideaBoxTags)
+      .set(body)
+      .where(eq(ideaBoxTags.id, id))
+      .returning()
+
+    return response.ok(serializeTag(updated))
+  })
 
 export const remove = forge
   .mutation({
     description: 'Delete a tag',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxTags)
       })
     },
-    existenceCheck: {
-      query: { id: 'tags' }
-    },
     output: {
-      NO_CONTENT: true,
-      NOT_FOUND: true
+      NO_CONTENT: true
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    await pb.delete.collection('tags').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    await db.delete(ideaBoxTags).where(eq(ideaBoxTags.id, id))
 
     return response.noContent()
   })

@@ -19,9 +19,7 @@ function EntryImage({ entry }: { entry: IdeaBoxIdea }) {
         ZoomContent={CustomZoomContent}
         zoomImg={{
           src: forgeAPI.getMedia({
-            collectionId: entry.child.collectionId,
-            recordId: entry.child.id,
-            fieldId: entry.image
+            key: entry.image
           })
         }}
         zoomMargin={40}
@@ -30,9 +28,7 @@ function EntryImage({ entry }: { entry: IdeaBoxIdea }) {
           <img
             alt={''}
             src={forgeAPI.getMedia({
-              collectionId: entry.child.collectionId,
-              recordId: entry.child.id,
-              fieldId: entry.image
+              key: entry.image
             })}
           />
         </Box>

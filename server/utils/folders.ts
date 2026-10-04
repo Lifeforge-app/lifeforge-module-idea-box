@@ -1,9 +1,19 @@
-import type { IPBService } from '@lifeforge/pocketbase'
+import { and, eq, ilike, isNull, sql } from 'drizzle-orm'
 
-import type schema from '../schema'
+import type { BuiltModuleSchema } from '@lifeforge/drizzle'
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+
+import type { IdeaBoxSchema } from '../forge'
+import {
+  ideaBoxEntries,
+  ideaBoxEntriesText,
+  ideaBoxFolders
+} from '../schema.drizzle'
+
+type IdeaBoxDb = PostgresJsDatabase<BuiltModuleSchema<IdeaBoxSchema>>
 
 export const validateFolderPath = async (
-  pb: IPBService<typeof schema>,
+  db: IdeaBoxDb,
   container: string,
   path: string[]
 ): Promise<{ folderExists: boolean; lastFolder: string }> => {
@@ -13,100 +23,78 @@ export const validateFolderPath = async (
   for (const folder of path) {
     if (!folder) continue
 
-    try {
-      const folderEntry = await pb.getOne
-        .collection('folders')
-        .id(folder)
-        .execute()
+    const folderEntry = await db.query.folders.findFirst({
+      where: { id: folder }
+    })
 
-      if (
-        folderEntry.parent !== lastFolder ||
-        folderEntry.container !== container
-      ) {
-        folderExists = false
-        break
-      }
-
-      lastFolder = folder
-    } catch {
+    if (
+      !folderEntry ||
+      (folderEntry.parent ?? '') !== lastFolder ||
+      folderEntry.container !== container
+    ) {
       folderExists = false
       break
     }
+
+    lastFolder = folder
   }
 
   return { folderExists, lastFolder }
 }
 
 export async function recursivelySearchFolder(
+  db: IdeaBoxDb,
   folderId: string,
   q: string,
   container: string,
   tags: string = '',
-  parents: string,
-  pb: IPBService<typeof schema>
+  parents: string
 ) {
-  const folderInsideFolder = await pb.getFullList
-    .collection('folders')
-    .filter([
-      {
-        field: 'parent',
-        operator: '=',
-        value: folderId
-      }
-    ])
-    .execute()
+  const folderInsideFolder = await db
+    .select()
+    .from(ideaBoxFolders)
+    .where(
+      folderId ? eq(ideaBoxFolders.parent, folderId) : isNull(ideaBoxFolders.parent)
+    )
 
   const thisFolder = folderId
-    ? await pb.getOne.collection('folders').id(folderId).execute()
+    ? await db.query.folders.findFirst({ where: { id: folderId } })
     : undefined
 
   const textResults = (
-    await pb.getFullList
-      .collection('entries_text')
-      .expand({ base_entry: 'entries' })
-      .filter([
-        {
-          field: 'content',
-          operator: '~',
-          value: q
-        },
-        {
-          field: 'base_entry.container',
-          operator: '=',
-          value: container
-        },
-        {
-          field: 'base_entry.archived',
-          operator: '=',
-          value: false
-        },
-        {
-          field: 'base_entry.folder',
-          operator: '=',
-          value: folderId
-        },
-        ...(tags
-          ? tags.split(',').map(
-              tag =>
-                ({
-                  field: 'base_entry.tags',
-                  operator: '~',
-                  value: tag
-                }) as const
-            )
-          : [])
-      ])
-      .execute()
+    await db
+      .select({
+        base_entry: ideaBoxEntries,
+        content: ideaBoxEntriesText.content
+      })
+      .from(ideaBoxEntriesText)
+      .innerJoin(
+        ideaBoxEntries,
+        eq(ideaBoxEntriesText.base_entry, ideaBoxEntries.id)
+      )
+      .where(
+        and(
+          ilike(ideaBoxEntriesText.content, `%${q}%`),
+          eq(ideaBoxEntries.container, container),
+          eq(ideaBoxEntries.archived, false),
+          folderId
+            ? eq(ideaBoxEntries.folder, folderId)
+            : isNull(ideaBoxEntries.folder),
+          ...(tags
+            ? tags
+                .split(',')
+                .map(tag => sql`jsonb_exists(${ideaBoxEntries.tags}, ${tag})`)
+            : [])
+        )
+      )
   ).map(result => ({
-    ...result.expand!.base_entry!,
-    collectionId: result.collectionId,
-    collectionName: result.collectionName,
+    ...result.base_entry,
     content: result.content,
+    type: 'text' as const,
+    fullPath: parents,
     expand: {
       folder: thisFolder
-    },
-    type: 'text' as const,
-    fullPath: parents
+    }
   }))
 
   if (folderInsideFolder.length === 0) {
@@ -115,12 +103,12 @@ export async function recursivelySearchFolder(
 
   for (const folder of folderInsideFolder) {
     const results = await recursivelySearchFolder(
+      db,
       folder.id,
       q,
       container,
       tags,
-      parents + '/' + folder.id,
-      pb
+      parents + '/' + folder.id
     )
 
     textResults.push(...results)

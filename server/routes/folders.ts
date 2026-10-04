@@ -1,32 +1,42 @@
+import { and, asc, eq, isNull } from 'drizzle-orm'
+import { createSelectSchema } from 'drizzle-orm/zod'
 import z from 'zod'
 
 import forge from '../forge'
-import ideaBoxSchemas from '../schema'
+import { ideaBoxContainers, ideaBoxFolders } from '../schema.drizzle'
 import { validateFolderPath } from '../utils/folders'
+
+const folderDto = createSelectSchema(ideaBoxFolders).extend({
+  container: z.string(),
+  parent: z.string()
+})
+
+function serializeFolder(row: typeof ideaBoxFolders.$inferSelect) {
+  return {
+    ...row,
+    container: row.container ?? '',
+    parent: row.parent ?? ''
+  }
+}
 
 export const list = forge
   .query({
     description: 'Get all folders in a path',
     input: {
       query: z.object({
-        container: z.string(),
+        container: forge.existsIn(z.string(), ideaBoxContainers),
         path: z.string()
       })
     },
-    existenceCheck: {
-      query: { container: 'containers' }
-    },
     output: {
-      OK: z.array(ideaBoxSchemas.folders),
-      BAD_REQUEST: z.string(),
-      NOT_FOUND: true
+      OK: z.array(folderDto)
     }
   })
-  .callback(async ({ pb, query: { container, path }, response }) => {
+  .callback(async ({ db, query: { container, path }, response }) => {
     const pathSegments = path.split('/').filter(p => p !== '')
 
-    const { folderExists } = await validateFolderPath(
-      pb,
+    const { folderExists, lastFolder } = await validateFolderPath(
+      db,
       container,
       pathSegments
     )
@@ -37,153 +47,137 @@ export const list = forge
       )
     }
 
-    const lastFolder =
-      pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : ''
+    const rows = await db
+      .select()
+      .from(ideaBoxFolders)
+      .where(
+        and(
+          eq(ideaBoxFolders.container, container),
+          lastFolder
+            ? eq(ideaBoxFolders.parent, lastFolder)
+            : isNull(ideaBoxFolders.parent)
+        )
+      )
+      .orderBy(asc(ideaBoxFolders.name))
 
-    return response.ok(
-      await pb.getFullList
-        .collection('folders')
-        .filter([
-          {
-            field: 'container',
-            operator: '=',
-            value: container
-          },
-          {
-            field: 'parent',
-            operator: '=',
-            value: lastFolder
-          }
-        ])
-        .sort(['name'])
-        .execute()
-    )
+    return response.ok(rows.map(serializeFolder))
   })
 
 export const create = forge
   .mutation({
     description: 'Create a new folder',
     input: {
-      body: ideaBoxSchemas.folders.omit({
-        collectionId: true,
-        collectionName: true,
-        id: true
+      body: z.object({
+        container: forge.existsIn(z.string(), ideaBoxContainers),
+        name: z.string(),
+        color: z.string(),
+        icon: z.string(),
+        parent: z.string().optional()
       })
     },
-    existenceCheck: {
-      body: {
-        container: 'containers',
-        parent: '[folders]'
-      }
-    },
     output: {
-      CREATED: ideaBoxSchemas.folders,
-      NOT_FOUND: true
+      CREATED: folderDto
     }
   })
-  .callback(async ({ pb, body, response }) =>
-    response.created(await pb.create.collection('folders').data(body).execute())
-  )
+  .callback(async ({ db, body, response }) => {
+    const [created] = await db
+      .insert(ideaBoxFolders)
+      .values({
+        container: body.container,
+        name: body.name,
+        color: body.color,
+        icon: body.icon,
+        parent: body.parent || null
+      })
+      .returning()
+
+    return response.created(serializeFolder(created))
+  })
 
 export const update = forge
   .mutation({
     description: 'Update folder details',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxFolders)
       }),
-      body: ideaBoxSchemas.folders.omit({
-        container: true,
-        parent: true,
-        collectionId: true,
-        collectionName: true,
-        id: true
+      body: z.object({
+        name: z.string(),
+        color: z.string(),
+        icon: z.string()
       })
     },
-    existenceCheck: {
-      query: { id: 'folders' }
-    },
     output: {
-      OK: ideaBoxSchemas.folders,
-      NOT_FOUND: true
+      OK: folderDto
     }
   })
-  .callback(async ({ pb, query: { id }, body, response }) =>
-    response.ok(
-      await pb.update.collection('folders').id(id).data(body).execute()
-    )
-  )
+  .callback(async ({ db, query: { id }, body, response }) => {
+    const [updated] = await db
+      .update(ideaBoxFolders)
+      .set(body)
+      .where(eq(ideaBoxFolders.id, id))
+      .returning()
+
+    return response.ok(serializeFolder(updated))
+  })
 
 export const moveTo = forge
   .mutation({
     description: 'Move folder to another parent',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxFolders)
       }),
       body: z.object({
-        target: z.string()
+        target: forge.existsIn(z.string(), ideaBoxFolders)
       })
     },
-    existenceCheck: {
-      query: { id: 'folders' },
-      body: { target: 'folders' }
-    },
     output: {
-      OK: ideaBoxSchemas.folders,
-      NOT_FOUND: true
+      OK: folderDto
     }
   })
-  .callback(async ({ pb, query: { id }, body: { target }, response }) =>
-    response.ok(
-      await pb.update
-        .collection('folders')
-        .id(id)
-        .data({
-          parent: target
-        })
-        .execute()
-    )
-  )
+  .callback(async ({ db, query: { id }, body: { target }, response }) => {
+    const [updated] = await db
+      .update(ideaBoxFolders)
+      .set({ parent: target })
+      .where(eq(ideaBoxFolders.id, id))
+      .returning()
+
+    return response.ok(serializeFolder(updated))
+  })
 
 export const removeFromParent = forge
   .mutation({
     description: 'Move folder to parent folder',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxFolders)
       })
     },
-    existenceCheck: {
-      query: { id: 'folders' }
-    },
     output: {
-      OK: ideaBoxSchemas.folders,
-      BAD_REQUEST: z.string(),
-      NOT_FOUND: true
+      OK: folderDto
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    const currentFolder = await pb.getOne.collection('folders').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    const currentFolder = (await db.query.folders.findFirst({
+      where: { id }
+    }))!
 
     if (!currentFolder.parent) {
       return response.badRequest('Folder is already at root level')
     }
 
-    const parentFolder = await pb.getOne
-      .collection('folders')
-      .id(currentFolder.parent)
-      .execute()
+    const parentFolder = (await db.query.folders.findFirst({
+      where: { id: currentFolder.parent }
+    }))!
 
-    return response.ok(
-      await pb.update
-        .collection('folders')
-        .id(id)
-        .data({
-          parent: parentFolder.parent || null
-        })
-        .execute()
-    )
+    const [updated] = await db
+      .update(ideaBoxFolders)
+      .set({ parent: parentFolder.parent || null })
+      .where(eq(ideaBoxFolders.id, id))
+      .returning()
+
+    return response.ok(serializeFolder(updated))
   })
 
 export const remove = forge
@@ -191,19 +185,15 @@ export const remove = forge
     description: 'Delete a folder',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxFolders)
       })
     },
-    existenceCheck: {
-      query: { id: 'folders' }
-    },
     output: {
-      NO_CONTENT: true,
-      NOT_FOUND: true
+      NO_CONTENT: true
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    await pb.delete.collection('folders').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    await db.delete(ideaBoxFolders).where(eq(ideaBoxFolders.id, id))
 
     return response.noContent()
   })

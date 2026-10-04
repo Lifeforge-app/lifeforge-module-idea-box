@@ -1,62 +1,89 @@
+import { and, desc, eq, isNull } from 'drizzle-orm'
+import { createSelectSchema } from 'drizzle-orm/zod'
 import z from 'zod'
 
 import forge from '../forge'
-import ideaBoxSchemas from '../schema'
+import {
+  ideaBoxContainers,
+  ideaBoxEntries,
+  ideaBoxEntriesImage,
+  ideaBoxEntriesLink,
+  ideaBoxEntriesText,
+  ideaBoxFolders
+} from '../schema.drizzle'
 import { validateFolderPath } from '../utils/folders'
 
-const ListIdeaSchema = ideaBoxSchemas.entries
-  .omit({
-    type: true
+const entryDto = createSelectSchema(ideaBoxEntries).extend({
+  container: z.string(),
+  folder: z.string(),
+  tags: z.array(z.string())
+})
+
+const listIdeaOutput = z.discriminatedUnion('type', [
+  entryDto.extend({
+    type: z.literal('text'),
+    content: z.string()
+  }),
+  entryDto.extend({
+    type: z.literal('image'),
+    image: z.string()
+  }),
+  entryDto.extend({
+    type: z.literal('link'),
+    link: z.string()
   })
-  .and(
-    z.union([
-      ideaBoxSchemas.entries_text.extend({
-        type: z.literal('text')
-      }),
-      ideaBoxSchemas.entries_image.extend({
-        type: z.literal('image'),
-        child: z.object({
-          id: z.string(),
-          collectionId: z.string()
-        })
-      }),
-      ideaBoxSchemas.entries_link.extend({
-        type: z.literal('link')
-      })
-    ])
-  )
+])
+
+function serializeEntry(row: typeof ideaBoxEntries.$inferSelect) {
+  return {
+    ...row,
+    container: row.container ?? '',
+    folder: row.folder ?? ''
+  }
+}
+
+function baseEntryInput() {
+  return {
+    container: forge.existsIn(z.string(), ideaBoxContainers),
+    folder: z.string().optional(),
+    tags: z.array(z.string())
+  }
+}
+
+const createInputDto = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('text'), ...baseEntryInput(), content: z.string() }),
+  z.object({ type: z.literal('image'), ...baseEntryInput() }),
+  z.object({ type: z.literal('link'), ...baseEntryInput(), link: z.string() })
+])
+
+const updateInputDto = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('text'), tags: z.array(z.string()), content: z.string() }),
+  z.object({ type: z.literal('image'), tags: z.array(z.string()) }),
+  z.object({ type: z.literal('link'), tags: z.array(z.string()), link: z.string() })
+])
 
 export const list = forge
   .query({
     description: 'Get all ideas from a folder or idea container',
     input: {
       query: z.object({
-        container: z.string(),
+        container: forge.existsIn(z.string(), ideaBoxContainers),
         path: z.string(),
         archived: z.string().optional()
       })
     },
-    existenceCheck: {
-      query: { container: 'containers' }
-    },
     output: {
-      OK: z.array(ListIdeaSchema),
-      BAD_REQUEST: z.string(),
-      NOT_FOUND: true
+      OK: z.array(listIdeaOutput)
     }
   })
   .callback(
-    async ({
-      pb,
-      query: { path: pathParam, container, archived },
-      response
-    }) => {
+    async ({ db, query: { container, path: pathParam, archived }, response }) => {
       const path = pathParam.split('/').filter(e => e)
 
       const parsedArchived = archived === 'true'
 
       const { folderExists, lastFolder } = await validateFolderPath(
-        pb,
+        db,
         container,
         path
       )
@@ -67,287 +94,119 @@ export const list = forge
         )
       }
 
-      const textIdeas = await pb.getFullList
-        .collection('entries_text')
-        .expand({
-          base_entry: 'entries'
+      const rows = await db
+        .select({
+          entry: ideaBoxEntries,
+          text: ideaBoxEntriesText,
+          link: ideaBoxEntriesLink,
+          image: ideaBoxEntriesImage
         })
-        .filter([
-          {
-            field: 'base_entry.container',
-            operator: '=',
-            value: container
-          },
-          {
-            field: 'base_entry.archived',
-            operator: '=',
-            value: parsedArchived
-          },
-          {
-            field: 'base_entry.folder',
-            operator: '=',
-            value: lastFolder || ''
+        .from(ideaBoxEntries)
+        .leftJoin(
+          ideaBoxEntriesText,
+          eq(ideaBoxEntriesText.base_entry, ideaBoxEntries.id)
+        )
+        .leftJoin(
+          ideaBoxEntriesLink,
+          eq(ideaBoxEntriesLink.base_entry, ideaBoxEntries.id)
+        )
+        .leftJoin(
+          ideaBoxEntriesImage,
+          eq(ideaBoxEntriesImage.base_entry, ideaBoxEntries.id)
+        )
+        .where(
+          and(
+            eq(ideaBoxEntries.container, container),
+            eq(ideaBoxEntries.archived, parsedArchived),
+            lastFolder
+              ? eq(ideaBoxEntries.folder, lastFolder)
+              : isNull(ideaBoxEntries.folder)
+          )
+        )
+        .orderBy(desc(ideaBoxEntries.pinned), desc(ideaBoxEntries.created))
+
+      const results = rows.map(row => {
+        const base = serializeEntry(row.entry)
+
+        if (row.entry.type === 'text') {
+          return {
+            ...base,
+            type: 'text' as const,
+            content: row.text?.content ?? ''
           }
-        ])
-        .sort(['-base_entry.pinned', '-base_entry.created'])
-        .execute()
+        }
 
-      const imageIdeas = await pb.getFullList
-        .collection('entries_image')
-        .expand({
-          base_entry: 'entries'
-        })
-        .filter([
-          {
-            field: 'base_entry.container',
-            operator: '=',
-            value: container
-          },
-          {
-            field: 'base_entry.archived',
-            operator: '=',
-            value: parsedArchived
-          },
-          {
-            field: 'base_entry.folder',
-            operator: '=',
-            value: lastFolder || ''
+        if (row.entry.type === 'link') {
+          return {
+            ...base,
+            type: 'link' as const,
+            link: row.link?.link ?? ''
           }
-        ])
-        .sort(['-base_entry.pinned', '-base_entry.created'])
-        .execute()
+        }
 
-      const linkIdeas = await pb.getFullList
-        .collection('entries_link')
-        .expand({
-          base_entry: 'entries'
-        })
-        .filter([
-          {
-            field: 'base_entry.container',
-            operator: '=',
-            value: container
-          },
-          {
-            field: 'base_entry.archived',
-            operator: '=',
-            value: parsedArchived
-          },
-          {
-            field: 'base_entry.folder',
-            operator: '=',
-            value: lastFolder || ''
-          }
-        ])
-        .sort(['-base_entry.pinned', '-base_entry.created'])
-        .execute()
+        return {
+          ...base,
+          type: 'image' as const,
+          image: row.image?.image ?? ''
+        }
+      })
 
-      return response.ok(
-        (
-          [
-            ...textIdeas.map(idea => ({
-              ...idea.expand!.base_entry,
-              content: idea.content,
-              type: 'text' as const
-            })),
-            ...imageIdeas.map(idea => ({
-              ...idea.expand!.base_entry,
-              child: {
-                id: idea.id,
-                collectionId: idea.collectionId
-              },
-              image: idea.image
-            })),
-            ...linkIdeas.map(idea => ({
-              ...idea.expand!.base_entry,
-              link: idea.link
-            }))
-          ] as z.infer<typeof ListIdeaSchema>[]
-        ).sort((a, b) => {
-          if (a.pinned && !b.pinned) return -1
-          if (!a.pinned && b.pinned) return 1
-
-          return new Date(b.created!).getTime() - new Date(a.created!).getTime()
-        })
-      )
+      return response.ok(results)
     }
-  )
-
-const createSchema = ideaBoxSchemas.entries
-  .omit({
-    created: true,
-    updated: true,
-    type: true,
-    archived: true,
-    pinned: true,
-    collectionId: true,
-    collectionName: true,
-    id: true
-  })
-  .and(
-    z.union([
-      ideaBoxSchemas.entries_text
-        .omit({
-          base_entry: true,
-          collectionId: true,
-          collectionName: true,
-          id: true
-        })
-        .extend({
-          type: z.literal('text')
-        }),
-      ideaBoxSchemas.entries_image
-        .omit({
-          base_entry: true,
-          image: true,
-          collectionId: true,
-          collectionName: true,
-          id: true
-        })
-        .extend({
-          type: z.literal('image')
-        }),
-      ideaBoxSchemas.entries_link
-        .omit({
-          base_entry: true,
-          collectionId: true,
-          collectionName: true,
-          id: true
-        })
-        .extend({
-          type: z.literal('link')
-        })
-    ])
   )
 
 export const create = forge
   .mutation({
     description: 'Create a new idea entry',
     input: {
-      body: createSchema
+      body: createInputDto
     },
     media: {
       image: {
         optional: true
       }
     },
-    existenceCheck: {
-      body: {
-        container: 'containers',
-        folder: '[folders]'
-      }
-    },
     output: {
-      CREATED: ideaBoxSchemas.entries,
-      BAD_REQUEST: z.string(),
-      NOT_FOUND: true
+      CREATED: entryDto
     }
   })
   .callback(
-    async ({
-      pb,
-      body: rawBody,
-      media: { image },
-      core: {
-        media: { retrieveMedia }
-      },
-      response
-    }) => {
-      const body = rawBody as z.infer<typeof createSchema>
-
-      const baseEntry = await pb.create
-        .collection('entries')
-        .data({
-          container: body.container,
-          folder: body.folder,
+    async ({ db, body, media: { image }, core: { storage }, response }) => {
+      const [baseEntry] = await db
+        .insert(ideaBoxEntries)
+        .values({
           type: body.type,
+          container: body.container,
+          folder: body.folder || null,
           tags: body.tags
         })
-        .execute()
+        .returning()
 
       if (body.type === 'text') {
-        await pb.create
-          .collection('entries_text')
-          .data({
-            base_entry: baseEntry.id,
-            content: body.content
-          })
-          .execute()
+        await db.insert(ideaBoxEntriesText).values({
+          base_entry: baseEntry.id,
+          content: body.content
+        })
       } else if (body.type === 'image') {
-        if (!image) {
+        if (!image || typeof image === 'string') {
           return response.badRequest('Image is required for image entries')
         }
 
-        const imageData = await retrieveMedia('image', image)
+        const ref = await storage.save({ file: image })
 
-        await pb.create
-          .collection('entries_image')
-          .data({
-            base_entry: baseEntry.id,
-            ...imageData
-          })
-          .execute()
+        await db.insert(ideaBoxEntriesImage).values({
+          base_entry: baseEntry.id,
+          image: ref?.key ?? ''
+        })
       } else if (body.type === 'link') {
-        await pb.create
-          .collection('entries_link')
-          .data({
-            base_entry: baseEntry.id,
-            link: body.link
-          })
-          .execute()
+        await db.insert(ideaBoxEntriesLink).values({
+          base_entry: baseEntry.id,
+          link: body.link
+        })
       }
 
-      return response.created(baseEntry)
+      return response.created(serializeEntry(baseEntry))
     }
-  )
-
-const updateSchema = ideaBoxSchemas.entries
-  .omit({
-    created: true,
-    updated: true,
-    type: true,
-    folder: true,
-    container: true,
-    archived: true,
-    pinned: true,
-    collectionId: true,
-    collectionName: true,
-    id: true
-  })
-  .and(
-    z.union([
-      ideaBoxSchemas.entries_text
-        .omit({
-          base_entry: true,
-          collectionId: true,
-          collectionName: true,
-          id: true
-        })
-        .extend({
-          type: z.literal('text')
-        }),
-      ideaBoxSchemas.entries_image
-        .omit({
-          base_entry: true,
-          image: true,
-          collectionId: true,
-          collectionName: true,
-          id: true
-        })
-        .extend({
-          type: z.literal('image')
-        }),
-      ideaBoxSchemas.entries_link
-        .omit({
-          base_entry: true,
-          collectionId: true,
-          collectionName: true,
-          id: true
-        })
-        .extend({
-          type: z.literal('link')
-        })
-    ])
   )
 
 export const update = forge
@@ -355,114 +214,58 @@ export const update = forge
     description: 'Update an existing idea',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxEntries)
       }),
-      body: updateSchema
+      body: updateInputDto
     },
     media: {
       image: {
         optional: true
       }
     },
-    existenceCheck: {
-      query: { id: 'entries' }
-    },
     output: {
-      OK: ideaBoxSchemas.entries,
-      BAD_REQUEST: z.string(),
-      NOT_FOUND: true
+      OK: entryDto
     }
   })
   .callback(
     async ({
-      pb,
+      db,
       query: { id },
-      body: rawBody,
+      body,
       media: { image },
-      core: {
-        media: { retrieveMedia }
-      },
+      core: { storage },
       response
     }) => {
-      const body = rawBody as z.infer<typeof createSchema>
-
-      const baseIdea = await pb.update
-        .collection('entries')
-        .id(id)
-        .data({
-          type: body.type,
-          tags: body.tags
-        })
-        .execute()
+      const [baseEntry] = await db
+        .update(ideaBoxEntries)
+        .set({ type: body.type, tags: body.tags, updated: new Date() })
+        .where(eq(ideaBoxEntries.id, id))
+        .returning()
 
       if (body.type === 'text') {
-        const existingText = await pb.getFirstListItem
-          .collection('entries_text')
-          .filter([
-            {
-              field: 'base_entry',
-              operator: '=',
-              value: baseIdea.id
-            }
-          ])
-          .execute()
-
-        await pb.update
-          .collection('entries_text')
-          .id(existingText.id)
-          .data({
-            content: body.content
-          })
-          .execute()
+        await db
+          .update(ideaBoxEntriesText)
+          .set({ content: body.content })
+          .where(eq(ideaBoxEntriesText.base_entry, id))
       } else if (body.type === 'image') {
-        if (!image) {
+        if (!image || typeof image === 'string') {
           return response.badRequest('Image is required for image entries')
         }
 
-        const existingImage = await pb.getFirstListItem
-          .collection('entries_image')
-          .filter([
-            {
-              field: 'base_entry',
-              operator: '=',
-              value: baseIdea.id
-            }
-          ])
-          .execute()
+        const ref = await storage.save({ file: image })
 
-        const imageData = await retrieveMedia('image', image)
-
-        await pb.update
-          .collection('entries_image')
-          .id(existingImage.id)
-          .data({
-            ...imageData
-          })
-          .execute()
+        await db
+          .update(ideaBoxEntriesImage)
+          .set({ image: ref?.key ?? '' })
+          .where(eq(ideaBoxEntriesImage.base_entry, id))
       } else if (body.type === 'link') {
-        const existingLink = await pb.getFirstListItem
-          .collection('entries_link')
-          .filter([
-            {
-              field: 'base_entry',
-              operator: '=',
-              value: baseIdea.id
-            }
-          ])
-          .execute()
-
-        await pb.update
-          .collection('entries_link')
-          .id(existingLink.id)
-          .data({
-            link: body.link
-          })
-          .execute()
-      } else {
-        return response.badRequest('Invalid idea type')
+        await db
+          .update(ideaBoxEntriesLink)
+          .set({ link: body.link })
+          .where(eq(ideaBoxEntriesLink.base_entry, id))
       }
 
-      return response.ok(baseIdea)
+      return response.ok(serializeEntry(baseEntry))
     }
   )
 
@@ -471,19 +274,15 @@ export const remove = forge
     description: 'Delete an idea',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxEntries)
       })
     },
-    existenceCheck: {
-      query: { id: 'entries' }
-    },
     output: {
-      NO_CONTENT: true,
-      NOT_FOUND: true
+      NO_CONTENT: true
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    await pb.delete.collection('entries').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    await db.delete(ideaBoxEntries).where(eq(ideaBoxEntries.id, id))
 
     return response.noContent()
   })
@@ -493,29 +292,23 @@ export const pin = forge
     description: 'Toggle pin status of an idea',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxEntries)
       })
     },
-    existenceCheck: {
-      query: { id: 'entries' }
-    },
     output: {
-      OK: ideaBoxSchemas.entries,
-      NOT_FOUND: true
+      OK: entryDto
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    const idea = await pb.getOne.collection('entries').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    const idea = (await db.query.entries.findFirst({ where: { id } }))!
 
-    return response.ok(
-      await pb.update
-        .collection('entries')
-        .id(id)
-        .data({
-          pinned: !idea.pinned
-        })
-        .execute()
-    )
+    const [updated] = await db
+      .update(ideaBoxEntries)
+      .set({ pinned: !idea.pinned })
+      .where(eq(ideaBoxEntries.id, id))
+      .returning()
+
+    return response.ok(serializeEntry(updated))
   })
 
 export const archive = forge
@@ -523,30 +316,23 @@ export const archive = forge
     description: 'Toggle archive status of an idea',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxEntries)
       })
     },
-    existenceCheck: {
-      query: { id: 'entries' }
-    },
     output: {
-      OK: ideaBoxSchemas.entries,
-      NOT_FOUND: true
+      OK: entryDto
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    const idea = await pb.getOne.collection('entries').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    const idea = (await db.query.entries.findFirst({ where: { id } }))!
 
-    return response.ok(
-      await pb.update
-        .collection('entries')
-        .id(id)
-        .data({
-          archived: !idea.archived,
-          pinned: false
-        })
-        .execute()
-    )
+    const [updated] = await db
+      .update(ideaBoxEntries)
+      .set({ archived: !idea.archived, pinned: false })
+      .where(eq(ideaBoxEntries.id, id))
+      .returning()
+
+    return response.ok(serializeEntry(updated))
   })
 
 export const moveTo = forge
@@ -554,29 +340,21 @@ export const moveTo = forge
     description: 'Move an idea to another folder',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxEntries)
       }),
       body: z.object({
-        target: z.string()
+        target: forge.existsIn(z.string(), ideaBoxFolders)
       })
-    },
-    existenceCheck: {
-      query: { id: 'entries' },
-      body: { target: 'folders' }
     },
     output: {
-      NO_CONTENT: true,
-      NOT_FOUND: true
+      NO_CONTENT: true
     }
   })
-  .callback(async ({ pb, query: { id }, body: { target }, response }) => {
-    await pb.update
-      .collection('entries')
-      .id(id)
-      .data({
-        folder: target
-      })
-      .execute()
+  .callback(async ({ db, query: { id }, body: { target }, response }) => {
+    await db
+      .update(ideaBoxEntries)
+      .set({ folder: target })
+      .where(eq(ideaBoxEntries.id, id))
 
     return response.noContent()
   })
@@ -586,41 +364,32 @@ export const removeFromParent = forge
     description: 'Move idea to parent folder',
     input: {
       query: z.object({
-        id: z.string()
+        id: forge.existsIn(z.string(), ideaBoxEntries)
       })
     },
-    existenceCheck: {
-      query: { id: 'entries' }
-    },
     output: {
-      NO_CONTENT: true,
-      BAD_REQUEST: z.string(),
-      NOT_FOUND: true
+      NO_CONTENT: true
     }
   })
-  .callback(async ({ pb, query: { id }, response }) => {
-    const currentIdea = await pb.getOne.collection('entries').id(id).execute()
+  .callback(async ({ db, query: { id }, response }) => {
+    const currentIdea = (await db.query.entries.findFirst({ where: { id } }))!
 
     if (!currentIdea.folder) {
       return response.badRequest('Idea is not in any folder')
     }
 
-    const currentFolder = await pb.getOne
-      .collection('folders')
-      .id(currentIdea.folder)
-      .execute()
+    const currentFolder = await db.query.folders.findFirst({
+      where: { id: currentIdea.folder }
+    })
 
     if (!currentFolder) {
       return response.badRequest('Current folder does not exist')
     }
 
-    await pb.update
-      .collection('entries')
-      .id(id)
-      .data({
-        folder: currentFolder.parent || ''
-      })
-      .execute()
+    await db
+      .update(ideaBoxEntries)
+      .set({ folder: currentFolder.parent || null })
+      .where(eq(ideaBoxEntries.id, id))
 
     return response.noContent()
   })

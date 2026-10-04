@@ -95,17 +95,18 @@ function ModifyIdeaModal({
     })
   )
 
+  const initialImage =
+    initialData && 'image' in initialData
+      ? (initialData.image as string | File | null | undefined)
+      : undefined
+
   const form = useForm({
     defaultValues: {
       ...createDefaultValues(schema),
       type: (initialData?.type as 'text' | 'link' | 'image') ?? 'text',
       content: initialData?.type === 'text' ? initialData.content || '' : '',
       link: initialData?.type === 'link' ? initialData.link || '' : '',
-      image: getFormFileFieldInitialData(
-        forgeAPI,
-        initialData?.child,
-        initialData?.image as File | string | null | undefined
-      ),
+      image: getFormFileFieldInitialData(forgeAPI, initialData, initialImage),
       tags:
         initialData?.tags?.map(
           tag => tagsQuery.data?.find(t => t.name === tag)?.id || tag
@@ -145,8 +146,7 @@ function ModifyIdeaModal({
           folder: path?.split('/').pop() ?? '',
           container: id ?? '',
           tags: initialData.tags || [],
-          image:
-            initialData.image instanceof File ? initialData.image : undefined
+          image: initialImage instanceof File ? initialImage : undefined
         })
         .then(() => {
           onClose()
