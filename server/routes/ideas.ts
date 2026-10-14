@@ -37,7 +37,7 @@ const listIdeaOutput = z.discriminatedUnion('type', [
 function serializeEntry(row: typeof ideaBoxEntries.$inferSelect) {
   return {
     ...row,
-    container: row.container ?? '',
+    container: row.container,
     folder: row.folder ?? ''
   }
 }
@@ -182,6 +182,10 @@ export const create = forge
         })
         .returning()
 
+      if (!baseEntry) {
+        return response.badRequest('Failed to create idea')
+      }
+
       if (body.type === 'text') {
         await db.insert(ideaBoxEntriesText).values({
           base_entry: baseEntry.id,
@@ -241,6 +245,10 @@ export const update = forge
         .set({ type: body.type, tags: body.tags, updated: new Date() })
         .where(eq(ideaBoxEntries.id, id))
         .returning()
+
+      if (!baseEntry) {
+        return response.notFound()
+      }
 
       if (body.type === 'text') {
         await db
@@ -308,6 +316,10 @@ export const pin = forge
       .where(eq(ideaBoxEntries.id, id))
       .returning()
 
+    if (!updated) {
+      return response.notFound()
+    }
+
     return response.ok(serializeEntry(updated))
   })
 
@@ -331,6 +343,10 @@ export const archive = forge
       .set({ archived: !idea.archived, pinned: false })
       .where(eq(ideaBoxEntries.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(serializeEntry(updated))
   })

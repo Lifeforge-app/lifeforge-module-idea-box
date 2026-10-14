@@ -91,6 +91,10 @@ export const create = forge
       })
       .returning()
 
+    if (!created) {
+      return response.badRequest('Failed to create folder')
+    }
+
     return response.created(serializeFolder(created))
   })
 
@@ -118,6 +122,10 @@ export const update = forge
       .where(eq(ideaBoxFolders.id, id))
       .returning()
 
+    if (!updated) {
+      return response.notFound()
+    }
+
     return response.ok(serializeFolder(updated))
   })
 
@@ -142,6 +150,10 @@ export const moveTo = forge
       .set({ parent: target })
       .where(eq(ideaBoxFolders.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(serializeFolder(updated))
   })
@@ -176,6 +188,10 @@ export const removeFromParent = forge
       .set({ parent: parentFolder.parent || null })
       .where(eq(ideaBoxFolders.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(serializeFolder(updated))
   })

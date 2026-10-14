@@ -250,7 +250,7 @@ export const search = forge
       return response.ok(
         results.map(result => ({
           ...result,
-          container: result.container ?? '',
+          container: result.container,
           folder: result.folder ?? '',
           expand: {
             folder: result.expand.folder

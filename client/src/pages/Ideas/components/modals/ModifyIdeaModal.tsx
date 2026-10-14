@@ -103,7 +103,8 @@ function ModifyIdeaModal({
   const form = useForm({
     defaultValues: {
       ...createDefaultValues(schema),
-      type: (initialData?.type as 'text' | 'link' | 'image') ?? 'text',
+      type:
+        (initialData?.type as 'text' | 'link' | 'image' | undefined) ?? 'text',
       content: initialData?.type === 'text' ? initialData.content || '' : '',
       link: initialData?.type === 'link' ? initialData.link || '' : '',
       image: getFormFileFieldInitialData(forgeAPI, initialData, initialImage),

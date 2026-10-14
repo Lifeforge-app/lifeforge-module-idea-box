@@ -89,6 +89,10 @@ export const create = forge
   .callback(async ({ db, body, response }) => {
     const [created] = await db.insert(ideaBoxTags).values(body).returning()
 
+    if (!created) {
+      return response.badRequest('Failed to create tag')
+    }
+
     return response.created(serializeTag(created))
   })
 
@@ -115,6 +119,10 @@ export const update = forge
       .set(body)
       .where(eq(ideaBoxTags.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(serializeTag(updated))
   })

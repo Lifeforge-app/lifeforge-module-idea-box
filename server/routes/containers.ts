@@ -128,6 +128,10 @@ export const create = forge
         })
         .returning()
 
+      if (!created) {
+        return response.badRequest('Failed to create container')
+      }
+
       return response.created(created)
     }
   )
@@ -180,6 +184,10 @@ export const update = forge
         .where(eq(ideaBoxContainers.id, id))
         .returning()
 
+      if (!updated) {
+        return response.notFound()
+      }
+
       return response.ok(updated)
     }
   )
@@ -225,6 +233,10 @@ export const togglePin = forge
       .where(eq(ideaBoxContainers.id, id))
       .returning()
 
+    if (!updated) {
+      return response.notFound()
+    }
+
     return response.ok(updated)
   })
 
@@ -250,6 +262,10 @@ export const toggleHide = forge
       .set({ hidden: !container.hidden, pinned: false })
       .where(eq(ideaBoxContainers.id, id))
       .returning()
+
+    if (!updated) {
+      return response.notFound()
+    }
 
     return response.ok(updated)
   })
