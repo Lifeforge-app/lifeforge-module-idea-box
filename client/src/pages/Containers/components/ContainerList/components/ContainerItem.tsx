@@ -10,6 +10,7 @@ import {
   ContextMenuItem,
   Flex,
   Icon,
+  Image,
   Text,
   toast,
   useModalStore
@@ -23,7 +24,6 @@ import ModifyContainerModal from '../../ModifyContainerModal'
 function ContainerItem({ container }: { container: IdeaBoxContainer }) {
   const queryClient = useQueryClient()
   const { open } = useModalStore()
-
   const [hovered, setHovered] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -102,8 +102,8 @@ function ContainerItem({ container }: { container: IdeaBoxContainer }) {
   return (
     <Card
       isInteractive
-      as="li"
       align="center"
+      as="li"
       justify="start"
       p="none"
       style={{ cursor: 'default' }}
@@ -126,37 +126,22 @@ function ContainerItem({ container }: { container: IdeaBoxContainer }) {
           />
         </Box>
       )}
-      <Flex
-        centered
+      <Image
+        alt=""
         aspectRatio="16 / 9"
         bg={{ base: 'bg-200', dark: 'bg-800' }}
+        fallback="tabler:bulb"
+        fit="cover"
         overflow="hidden"
         rtl="lg"
         rtr="lg"
+        src={
+          container.cover !== ''
+            ? forgeAPI.getMedia({ key: container.cover, thumb: '0x300' })
+            : undefined
+        }
         width="100%"
-      >
-        {container.cover !== '' ? (
-          <img
-            alt=""
-            src={forgeAPI.getMedia({
-              key: container.cover,
-              thumb: '0x300'
-            })}
-            style={{
-              aspectRatio: '16 / 9',
-              height: '100%',
-              objectFit: 'cover',
-              width: '100%'
-            }}
-          />
-        ) : (
-          <Icon
-            color={{ base: 'bg-300', dark: 'bg-700' }}
-            icon="tabler:bulb"
-            size="6rem"
-          />
-        )}
-      </Flex>
+      />
       <Flex
         align="center"
         direction="column"

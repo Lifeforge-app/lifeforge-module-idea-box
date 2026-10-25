@@ -1,6 +1,4 @@
-import Zoom from 'react-medium-image-zoom'
-
-import { Box } from '@lifeforge/ui'
+import { ZoomableImage } from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
 import type { IdeaBoxIdea } from '@/providers/IdeaBoxProvider'
@@ -15,24 +13,15 @@ function EntryImage({ entry }: { entry: IdeaBoxIdea }) {
 
   return (
     <IdeaWrapper entry={entry}>
-      <Zoom
-        ZoomContent={CustomZoomContent}
-        zoomImg={{
-          src: forgeAPI.getMedia({
-            key: entry.image
-          })
-        }}
+      <ZoomableImage
+        shadow
+        alt=""
+        fallback={null}
+        r="lg"
+        src={forgeAPI.getMedia({ key: entry.image })}
         zoomMargin={40}
-      >
-        <Box asChild r="lg" shadow>
-          <img
-            alt={''}
-            src={forgeAPI.getMedia({
-              key: entry.image
-            })}
-          />
-        </Box>
-      </Zoom>
+        zoomProps={{ ZoomContent: CustomZoomContent }}
+      />
     </IdeaWrapper>
   )
 }

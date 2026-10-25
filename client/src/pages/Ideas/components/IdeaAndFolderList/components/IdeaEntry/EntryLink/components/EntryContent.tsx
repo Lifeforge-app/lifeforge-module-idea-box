@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { memo } from 'react'
 
-import { Stack, Text, surface } from '@lifeforge/ui'
+import { Image, Stack, Text, surface } from '@lifeforge/ui'
 
 import { forgeAPI } from '@/manifest'
 import type { IdeaBoxIdea } from '@/providers/IdeaBoxProvider'
@@ -19,11 +19,11 @@ function EntryContent({ entry }: { entry: IdeaBoxIdea }) {
 
   return OGQuery.isSuccess && OGQuery.data ? (
     <Stack
+      shadow
       as="button"
       bg={surface.lightInteractive}
       p="sm"
       r="md"
-      shadow
       style={{ cursor: 'pointer', textAlign: 'left' }}
       onClick={() => {
         const a = document.createElement('a')
@@ -35,8 +35,11 @@ function EntryContent({ entry }: { entry: IdeaBoxIdea }) {
       }}
     >
       {OGQuery.data.ogImage !== undefined && (
-        <img
+        <Image
           alt=""
+          fallback={null}
+          fit="contain"
+          r="md"
           src={(() => {
             const url: string = OGQuery.data.ogImage?.[0].url
 
@@ -48,12 +51,7 @@ function EntryContent({ entry }: { entry: IdeaBoxIdea }) {
 
             return url
           })()}
-          style={{
-            border: 0,
-            borderRadius: 'var(--radius-md)',
-            objectFit: 'contain',
-            width: '100%'
-          }}
+          width="100%"
         />
       )}
       <Text color="primary" size="xs" weight="medium">
