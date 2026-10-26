@@ -1,2195 +1,749 @@
-export const contract = {
-  "containers": {
-    "create": {
-      "method": "post",
-      "description": "Create a new container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": {
-        "cover": {
-          "optional": true
-        }
-      },
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "icon",
-            "color"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "cover": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "hidden": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "icon",
-            "color",
-            "cover",
-            "pinned",
-            "hidden"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "list": {
-      "method": "get",
-      "description": "Get all containers with stats",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "hidden": {
-              "type": "string"
-            }
-          },
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "name": {
-                "type": "string"
-              },
-              "icon": {
-                "type": "string"
-              },
-              "color": {
-                "type": "string"
-              },
-              "cover": {
-                "type": "string"
-              },
-              "pinned": {
-                "type": "boolean"
-              },
-              "hidden": {
-                "type": "boolean"
-              },
-              "text_count": {
-                "type": "number"
-              },
-              "link_count": {
-                "type": "number"
-              },
-              "image_count": {
-                "type": "number"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "icon",
-              "color",
-              "cover",
-              "pinned",
-              "hidden",
-              "text_count",
-              "link_count",
-              "image_count"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete a container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "toggleHide": {
-      "method": "post",
-      "description": "Toggle visibility of a container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "cover": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "hidden": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "icon",
-            "color",
-            "cover",
-            "pinned",
-            "hidden"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "togglePin": {
-      "method": "post",
-      "description": "Toggle pin status of a container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "cover": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "hidden": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "icon",
-            "color",
-            "cover",
-            "pinned",
-            "hidden"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": {
-        "cover": {
-          "optional": true
-        }
-      },
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "icon",
-            "color"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "cover": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "hidden": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "icon",
-            "color",
-            "cover",
-            "pinned",
-            "hidden"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "validate": {
-      "method": "get",
-      "description": "Validate if a container exists",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "boolean"
-        }
-      }
+export type EndpointContainersList_OutputOK = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  cover: string;
+  pinned: boolean;
+  hidden: boolean;
+  text_count: number;
+  link_count: number;
+  image_count: number;
+}[];
+export type EndpointContainersRemove_OutputNO_CONTENT = void;
+export type EndpointContainersValidate_OutputOK = boolean;
+export type EndpointFoldersList_OutputOK = {
+  id: string;
+  container: string;
+  name: string;
+  color: string;
+  icon: string;
+  parent: string;
+}[];
+export type EndpointFoldersRemove_OutputNO_CONTENT = void;
+export type EndpointIdeasCreate_InputBody =
+  | {
+      type: "text";
+      container: string;
+      folder?: string;
+      tags: string[];
+      content: string;
     }
-  },
-  "folders": {
-    "create": {
-      "method": "post",
-      "description": "Create a new folder",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "container": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "parent": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "container",
-            "name",
-            "color",
-            "icon"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "container": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "parent": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id",
-            "container",
-            "name",
-            "color",
-            "icon",
-            "parent"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "list": {
-      "method": "get",
-      "description": "Get all folders in a path",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "container": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "container",
-            "path"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "container": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "color": {
-                "type": "string"
-              },
-              "icon": {
-                "type": "string"
-              },
-              "parent": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "container",
-              "name",
-              "color",
-              "icon",
-              "parent"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "moveTo": {
-      "method": "post",
-      "description": "Move folder to another parent",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "target": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "target"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "container": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "parent": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id",
-            "container",
-            "name",
-            "color",
-            "icon",
-            "parent"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete a folder",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "removeFromParent": {
-      "method": "post",
-      "description": "Move folder to parent folder",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "container": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "parent": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id",
-            "container",
-            "name",
-            "color",
-            "icon",
-            "parent"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update folder details",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "color",
-            "icon"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "container": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "parent": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id",
-            "container",
-            "name",
-            "color",
-            "icon",
-            "parent"
-          ],
-          "additionalProperties": false
-        }
-      }
+  | {
+      type: "image";
+      container: string;
+      folder?: string;
+      tags: string[];
     }
-  },
-  "ideas": {
-    "archive": {
-      "method": "post",
-      "description": "Toggle archive status of an idea",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "type": {
-              "type": "string",
-              "enum": [
-                "text",
-                "image",
-                "link"
-              ]
-            },
-            "container": {
-              "type": "string"
-            },
-            "folder": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "archived": {
-              "type": "boolean"
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "type",
-            "container",
-            "folder",
-            "pinned",
-            "archived",
-            "tags",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "create": {
-      "method": "post",
-      "description": "Create a new idea entry",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": {
-        "image": {
-          "optional": true
-        }
-      },
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "oneOf": [
-            {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "const": "text"
-                },
-                "container": {
-                  "type": "string"
-                },
-                "folder": {
-                  "type": "string"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "content": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "type",
-                "container",
-                "tags",
-                "content"
-              ],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "const": "image"
-                },
-                "container": {
-                  "type": "string"
-                },
-                "folder": {
-                  "type": "string"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": [
-                "type",
-                "container",
-                "tags"
-              ],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "const": "link"
-                },
-                "container": {
-                  "type": "string"
-                },
-                "folder": {
-                  "type": "string"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "link": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "type",
-                "container",
-                "tags",
-                "link"
-              ],
-              "additionalProperties": false
-            }
-          ]
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "type": {
-              "type": "string",
-              "enum": [
-                "text",
-                "image",
-                "link"
-              ]
-            },
-            "container": {
-              "type": "string"
-            },
-            "folder": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "archived": {
-              "type": "boolean"
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "type",
-            "container",
-            "folder",
-            "pinned",
-            "archived",
-            "tags",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "list": {
-      "method": "get",
-      "description": "Get all ideas from a folder or idea container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "container": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            },
-            "archived": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "container",
-            "path"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "type": {
-                    "type": "string",
-                    "const": "text"
-                  },
-                  "container": {
-                    "type": "string"
-                  },
-                  "folder": {
-                    "type": "string"
-                  },
-                  "pinned": {
-                    "type": "boolean"
-                  },
-                  "archived": {
-                    "type": "boolean"
-                  },
-                  "tags": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "created": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updated": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "content": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "id",
-                  "type",
-                  "container",
-                  "folder",
-                  "pinned",
-                  "archived",
-                  "tags",
-                  "created",
-                  "updated",
-                  "content"
-                ],
-                "additionalProperties": false
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "type": {
-                    "type": "string",
-                    "const": "image"
-                  },
-                  "container": {
-                    "type": "string"
-                  },
-                  "folder": {
-                    "type": "string"
-                  },
-                  "pinned": {
-                    "type": "boolean"
-                  },
-                  "archived": {
-                    "type": "boolean"
-                  },
-                  "tags": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "created": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updated": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "image": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "id",
-                  "type",
-                  "container",
-                  "folder",
-                  "pinned",
-                  "archived",
-                  "tags",
-                  "created",
-                  "updated",
-                  "image"
-                ],
-                "additionalProperties": false
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "type": {
-                    "type": "string",
-                    "const": "link"
-                  },
-                  "container": {
-                    "type": "string"
-                  },
-                  "folder": {
-                    "type": "string"
-                  },
-                  "pinned": {
-                    "type": "boolean"
-                  },
-                  "archived": {
-                    "type": "boolean"
-                  },
-                  "tags": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "created": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updated": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "link": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "id",
-                  "type",
-                  "container",
-                  "folder",
-                  "pinned",
-                  "archived",
-                  "tags",
-                  "created",
-                  "updated",
-                  "link"
-                ],
-                "additionalProperties": false
-              }
-            ]
-          }
-        }
-      }
-    },
-    "moveTo": {
-      "method": "post",
-      "description": "Move an idea to another folder",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "target": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "target"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "pin": {
-      "method": "post",
-      "description": "Toggle pin status of an idea",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "type": {
-              "type": "string",
-              "enum": [
-                "text",
-                "image",
-                "link"
-              ]
-            },
-            "container": {
-              "type": "string"
-            },
-            "folder": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "archived": {
-              "type": "boolean"
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "type",
-            "container",
-            "folder",
-            "pinned",
-            "archived",
-            "tags",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete an idea",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "removeFromParent": {
-      "method": "post",
-      "description": "Move idea to parent folder",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing idea",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": {
-        "image": {
-          "optional": true
-        }
-      },
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "oneOf": [
-            {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "const": "text"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "content": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "type",
-                "tags",
-                "content"
-              ],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "const": "image"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": [
-                "type",
-                "tags"
-              ],
-              "additionalProperties": false
-            },
-            {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "const": "link"
-                },
-                "tags": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "link": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "type",
-                "tags",
-                "link"
-              ],
-              "additionalProperties": false
-            }
-          ]
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "type": {
-              "type": "string",
-              "enum": [
-                "text",
-                "image",
-                "link"
-              ]
-            },
-            "container": {
-              "type": "string"
-            },
-            "folder": {
-              "type": "string"
-            },
-            "pinned": {
-              "type": "boolean"
-            },
-            "archived": {
-              "type": "boolean"
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updated": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          "required": [
-            "id",
-            "type",
-            "container",
-            "folder",
-            "pinned",
-            "archived",
-            "tags",
-            "created",
-            "updated"
-          ],
-          "additionalProperties": false
-        }
-      }
+  | {
+      type: "link";
+      container: string;
+      folder?: string;
+      tags: string[];
+      link: string;
+    };
+export type EndpointIdeasList_OutputOK = (
+  | {
+      id: string;
+      type: "text";
+      container: string;
+      folder: string;
+      pinned: boolean;
+      archived: boolean;
+      tags: string[];
+      created: string;
+      updated: string;
+      content: string;
     }
-  },
-  "tags": {
-    "create": {
-      "method": "post",
-      "description": "Create a new tag",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "container": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "icon",
-            "color",
-            "container"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "CREATED": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "container": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "icon",
-            "color",
-            "container"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "list": {
-      "method": "get",
-      "description": "Get all tags in a container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "container": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "container"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "name": {
-                "type": "string"
-              },
-              "icon": {
-                "type": "string"
-              },
-              "color": {
-                "type": "string"
-              },
-              "container": {
-                "type": "string"
-              },
-              "amount": {
-                "type": "number"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "icon",
-              "color",
-              "container",
-              "amount"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
-    "remove": {
-      "method": "post",
-      "description": "Delete a tag",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "NO_CONTENT": true
-      }
-    },
-    "update": {
-      "method": "post",
-      "description": "Update an existing tag",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "body": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "icon",
-            "color"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            },
-            "name": {
-              "type": "string"
-            },
-            "icon": {
-              "type": "string"
-            },
-            "color": {
-              "type": "string"
-            },
-            "container": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id",
-            "name",
-            "icon",
-            "color",
-            "container"
-          ],
-          "additionalProperties": false
-        }
-      }
+  | {
+      id: string;
+      type: "image";
+      container: string;
+      folder: string;
+      pinned: boolean;
+      archived: boolean;
+      tags: string[];
+      created: string;
+      updated: string;
+      image: string;
     }
-  },
-  "misc": {
-    "checkValid": {
-      "method": "get",
-      "description": "Validate if a folder path exists",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "container": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "container",
-            "path"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "boolean"
-        }
-      }
-    },
-    "getOgData": {
-      "method": "get",
-      "description": "Get Open Graph metadata for a link entry",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "ogTitle": {
-              "type": "string"
-            },
-            "ogDescription": {
-              "type": "string"
-            },
-            "ogSiteName": {
-              "type": "string"
-            },
-            "ogImage": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "url": {
-                    "type": "string"
-                  },
-                  "width": {
-                    "type": "number"
-                  },
-                  "height": {
-                    "type": "number"
-                  },
-                  "type": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "url"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "additionalProperties": false
-        }
-      }
-    },
-    "getPath": {
-      "method": "get",
-      "description": "Get path information for a container or folder",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "container": {
-              "type": "string"
-            },
-            "folder": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "container"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "container": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "icon": {
-                  "type": "string"
-                },
-                "color": {
-                  "type": "string"
-                },
-                "cover": {
-                  "type": "string"
-                },
-                "pinned": {
-                  "type": "boolean"
-                },
-                "hidden": {
-                  "type": "boolean"
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "icon",
-                "color",
-                "cover",
-                "pinned",
-                "hidden"
-              ],
-              "additionalProperties": false
-            },
-            "route": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                  },
-                  "container": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "color": {
-                    "type": "string"
-                  },
-                  "icon": {
-                    "type": "string"
-                  },
-                  "parent": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "id",
-                  "container",
-                  "name",
-                  "color",
-                  "icon",
-                  "parent"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": [
-            "container",
-            "route"
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "search": {
-      "method": "get",
-      "description": "Search entries in a container",
-      "noAuth": false,
-      "encrypted": true,
-      "isDownloadable": false,
-      "media": null,
-      "input": {
-        "query": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "object",
-          "properties": {
-            "q": {
-              "type": "string"
-            },
-            "container": {
-              "type": "string"
-            },
-            "tags": {
-              "type": "string"
-            },
-            "folder": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "q",
-            "container"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "output": {
-        "OK": {
-          "$schema": "https://json-schema.org/draft/2020-12/schema",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "type": {
-                "type": "string",
-                "const": "text"
-              },
-              "container": {
-                "type": "string"
-              },
-              "folder": {
-                "type": "string"
-              },
-              "pinned": {
-                "type": "boolean"
-              },
-              "archived": {
-                "type": "boolean"
-              },
-              "tags": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "created": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "updated": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "content": {
-                "type": "string"
-              },
-              "fullPath": {
-                "type": "string"
-              },
-              "expand": {
-                "type": "object",
-                "properties": {
-                  "folder": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "container": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "color": {
-                        "type": "string"
-                      },
-                      "icon": {
-                        "type": "string"
-                      },
-                      "parent": {
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "id",
-                      "container",
-                      "name",
-                      "color",
-                      "icon",
-                      "parent"
-                    ],
-                    "additionalProperties": false
-                  }
-                },
-                "additionalProperties": false
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "container",
-              "folder",
-              "pinned",
-              "archived",
-              "tags",
-              "created",
-              "updated",
-              "content",
-              "fullPath",
-              "expand"
-            ],
-            "additionalProperties": false
-          }
-        }
-      }
+  | {
+      id: string;
+      type: "link";
+      container: string;
+      folder: string;
+      pinned: boolean;
+      archived: boolean;
+      tags: string[];
+      created: string;
+      updated: string;
+      link: string;
     }
-  }
-} as const
+)[];
+export type EndpointIdeasMoveTo_OutputNO_CONTENT = void;
+export type EndpointIdeasRemove_OutputNO_CONTENT = void;
+export type EndpointIdeasRemoveFromParent_OutputNO_CONTENT = void;
+export type EndpointIdeasUpdate_InputBody =
+  | {
+      type: "text";
+      tags: string[];
+      content: string;
+    }
+  | {
+      type: "image";
+      tags: string[];
+    }
+  | {
+      type: "link";
+      tags: string[];
+      link: string;
+    };
+export type EndpointTagsList_OutputOK = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  container: string;
+  amount: number;
+}[];
+export type EndpointTagsRemove_OutputNO_CONTENT = void;
+export type EndpointMiscCheckValid_OutputOK = boolean;
+export type EndpointMiscSearch_OutputOK = {
+  id: string;
+  type: "text";
+  container: string;
+  folder: string;
+  pinned: boolean;
+  archived: boolean;
+  tags: string[];
+  created: string;
+  updated: string;
+  content: string;
+  fullPath: string;
+  expand: {
+    folder?: {
+      id: string;
+      container: string;
+      name: string;
+      color: string;
+      icon: string;
+      parent: string;
+    };
+  };
+}[];
 
-export default contract
+export interface Contract {
+  containers: {
+    create: EndpointContainersCreate;
+    list: EndpointContainersList;
+    remove: EndpointContainersRemove;
+    toggleHide: EndpointContainersToggleHide;
+    togglePin: EndpointContainersTogglePin;
+    update: EndpointContainersUpdate;
+    validate: EndpointContainersValidate;
+  };
+  folders: {
+    create: EndpointFoldersCreate;
+    list: EndpointFoldersList;
+    moveTo: EndpointFoldersMoveTo;
+    remove: EndpointFoldersRemove;
+    removeFromParent: EndpointFoldersRemoveFromParent;
+    update: EndpointFoldersUpdate;
+  };
+  ideas: {
+    archive: EndpointIdeasArchive;
+    create: EndpointIdeasCreate;
+    list: EndpointIdeasList;
+    moveTo: EndpointIdeasMoveTo;
+    pin: EndpointIdeasPin;
+    remove: EndpointIdeasRemove;
+    removeFromParent: EndpointIdeasRemoveFromParent;
+    update: EndpointIdeasUpdate;
+  };
+  tags: {
+    create: EndpointTagsCreate;
+    list: EndpointTagsList;
+    remove: EndpointTagsRemove;
+    update: EndpointTagsUpdate;
+  };
+  misc: {
+    checkValid: EndpointMiscCheckValid;
+    getOgData: EndpointMiscGetOgData;
+    getPath: EndpointMiscGetPath;
+    search: EndpointMiscSearch;
+  };
+}
+export interface EndpointContainersCreate {
+  method: "post";
+  input: {
+    body?: EndpointContainersCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointContainersCreate_OutputCREATED;
+  };
+  media: {cover: {optional: true}};
+}
+export interface EndpointContainersCreate_InputBody {
+  name: string;
+  icon: string;
+  color: string;
+}
+export interface EndpointContainersCreate_OutputCREATED {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  cover: string;
+  pinned: boolean;
+  hidden: boolean;
+}
+export interface EndpointContainersList {
+  method: "get";
+  input: {
+    query?: EndpointContainersList_InputQuery;
+  };
+  output: {
+    OK: EndpointContainersList_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointContainersList_InputQuery {
+  hidden?: string;
+}
+export interface EndpointContainersRemove {
+  method: "post";
+  input: {
+    query?: EndpointContainersRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointContainersRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointContainersRemove_InputQuery {
+  id: string;
+}
+export interface EndpointContainersToggleHide {
+  method: "post";
+  input: {
+    query?: EndpointContainersToggleHide_InputQuery;
+  };
+  output: {
+    OK: EndpointContainersToggleHide_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointContainersToggleHide_InputQuery {
+  id: string;
+}
+export interface EndpointContainersToggleHide_OutputOK {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  cover: string;
+  pinned: boolean;
+  hidden: boolean;
+}
+export interface EndpointContainersTogglePin {
+  method: "post";
+  input: {
+    query?: EndpointContainersTogglePin_InputQuery;
+  };
+  output: {
+    OK: EndpointContainersTogglePin_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointContainersTogglePin_InputQuery {
+  id: string;
+}
+export interface EndpointContainersTogglePin_OutputOK {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  cover: string;
+  pinned: boolean;
+  hidden: boolean;
+}
+export interface EndpointContainersUpdate {
+  method: "post";
+  input: {
+    query?: EndpointContainersUpdate_InputQuery;
+    body?: EndpointContainersUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointContainersUpdate_OutputOK;
+  };
+  media: {cover: {optional: true}};
+}
+export interface EndpointContainersUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointContainersUpdate_InputBody {
+  name: string;
+  icon: string;
+  color: string;
+}
+export interface EndpointContainersUpdate_OutputOK {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  cover: string;
+  pinned: boolean;
+  hidden: boolean;
+}
+export interface EndpointContainersValidate {
+  method: "get";
+  input: {
+    query?: EndpointContainersValidate_InputQuery;
+  };
+  output: {
+    OK: EndpointContainersValidate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointContainersValidate_InputQuery {
+  id: string;
+}
+export interface EndpointFoldersCreate {
+  method: "post";
+  input: {
+    body?: EndpointFoldersCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointFoldersCreate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointFoldersCreate_InputBody {
+  container: string;
+  name: string;
+  color: string;
+  icon: string;
+  parent?: string;
+}
+export interface EndpointFoldersCreate_OutputCREATED {
+  id: string;
+  container: string;
+  name: string;
+  color: string;
+  icon: string;
+  parent: string;
+}
+export interface EndpointFoldersList {
+  method: "get";
+  input: {
+    query?: EndpointFoldersList_InputQuery;
+  };
+  output: {
+    OK: EndpointFoldersList_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointFoldersList_InputQuery {
+  container: string;
+  path: string;
+}
+export interface EndpointFoldersMoveTo {
+  method: "post";
+  input: {
+    query?: EndpointFoldersMoveTo_InputQuery;
+    body?: EndpointFoldersMoveTo_InputBody;
+  };
+  output: {
+    OK: EndpointFoldersMoveTo_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointFoldersMoveTo_InputQuery {
+  id: string;
+}
+export interface EndpointFoldersMoveTo_InputBody {
+  target: string;
+}
+export interface EndpointFoldersMoveTo_OutputOK {
+  id: string;
+  container: string;
+  name: string;
+  color: string;
+  icon: string;
+  parent: string;
+}
+export interface EndpointFoldersRemove {
+  method: "post";
+  input: {
+    query?: EndpointFoldersRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointFoldersRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointFoldersRemove_InputQuery {
+  id: string;
+}
+export interface EndpointFoldersRemoveFromParent {
+  method: "post";
+  input: {
+    query?: EndpointFoldersRemoveFromParent_InputQuery;
+  };
+  output: {
+    OK: EndpointFoldersRemoveFromParent_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointFoldersRemoveFromParent_InputQuery {
+  id: string;
+}
+export interface EndpointFoldersRemoveFromParent_OutputOK {
+  id: string;
+  container: string;
+  name: string;
+  color: string;
+  icon: string;
+  parent: string;
+}
+export interface EndpointFoldersUpdate {
+  method: "post";
+  input: {
+    query?: EndpointFoldersUpdate_InputQuery;
+    body?: EndpointFoldersUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointFoldersUpdate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointFoldersUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointFoldersUpdate_InputBody {
+  name: string;
+  color: string;
+  icon: string;
+}
+export interface EndpointFoldersUpdate_OutputOK {
+  id: string;
+  container: string;
+  name: string;
+  color: string;
+  icon: string;
+  parent: string;
+}
+export interface EndpointIdeasArchive {
+  method: "post";
+  input: {
+    query?: EndpointIdeasArchive_InputQuery;
+  };
+  output: {
+    OK: EndpointIdeasArchive_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointIdeasArchive_InputQuery {
+  id: string;
+}
+export interface EndpointIdeasArchive_OutputOK {
+  id: string;
+  type: "text" | "image" | "link";
+  container: string;
+  folder: string;
+  pinned: boolean;
+  archived: boolean;
+  tags: string[];
+  created: string;
+  updated: string;
+}
+export interface EndpointIdeasCreate {
+  method: "post";
+  input: {
+    body?: EndpointIdeasCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointIdeasCreate_OutputCREATED;
+  };
+  media: {image: {optional: true}};
+}
+export interface EndpointIdeasCreate_OutputCREATED {
+  id: string;
+  type: "text" | "image" | "link";
+  container: string;
+  folder: string;
+  pinned: boolean;
+  archived: boolean;
+  tags: string[];
+  created: string;
+  updated: string;
+}
+export interface EndpointIdeasList {
+  method: "get";
+  input: {
+    query?: EndpointIdeasList_InputQuery;
+  };
+  output: {
+    OK: EndpointIdeasList_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointIdeasList_InputQuery {
+  container: string;
+  path: string;
+  archived?: string;
+}
+export interface EndpointIdeasMoveTo {
+  method: "post";
+  input: {
+    query?: EndpointIdeasMoveTo_InputQuery;
+    body?: EndpointIdeasMoveTo_InputBody;
+  };
+  output: {
+    NO_CONTENT: EndpointIdeasMoveTo_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointIdeasMoveTo_InputQuery {
+  id: string;
+}
+export interface EndpointIdeasMoveTo_InputBody {
+  target: string;
+}
+export interface EndpointIdeasPin {
+  method: "post";
+  input: {
+    query?: EndpointIdeasPin_InputQuery;
+  };
+  output: {
+    OK: EndpointIdeasPin_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointIdeasPin_InputQuery {
+  id: string;
+}
+export interface EndpointIdeasPin_OutputOK {
+  id: string;
+  type: "text" | "image" | "link";
+  container: string;
+  folder: string;
+  pinned: boolean;
+  archived: boolean;
+  tags: string[];
+  created: string;
+  updated: string;
+}
+export interface EndpointIdeasRemove {
+  method: "post";
+  input: {
+    query?: EndpointIdeasRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointIdeasRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointIdeasRemove_InputQuery {
+  id: string;
+}
+export interface EndpointIdeasRemoveFromParent {
+  method: "post";
+  input: {
+    query?: EndpointIdeasRemoveFromParent_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointIdeasRemoveFromParent_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointIdeasRemoveFromParent_InputQuery {
+  id: string;
+}
+export interface EndpointIdeasUpdate {
+  method: "post";
+  input: {
+    query?: EndpointIdeasUpdate_InputQuery;
+    body?: EndpointIdeasUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointIdeasUpdate_OutputOK;
+  };
+  media: {image: {optional: true}};
+}
+export interface EndpointIdeasUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointIdeasUpdate_OutputOK {
+  id: string;
+  type: "text" | "image" | "link";
+  container: string;
+  folder: string;
+  pinned: boolean;
+  archived: boolean;
+  tags: string[];
+  created: string;
+  updated: string;
+}
+export interface EndpointTagsCreate {
+  method: "post";
+  input: {
+    body?: EndpointTagsCreate_InputBody;
+  };
+  output: {
+    CREATED: EndpointTagsCreate_OutputCREATED;
+  };
+  media: null;
+}
+export interface EndpointTagsCreate_InputBody {
+  name: string;
+  icon: string;
+  color: string;
+  container: string;
+}
+export interface EndpointTagsCreate_OutputCREATED {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  container: string;
+}
+export interface EndpointTagsList {
+  method: "get";
+  input: {
+    query?: EndpointTagsList_InputQuery;
+  };
+  output: {
+    OK: EndpointTagsList_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointTagsList_InputQuery {
+  container: string;
+}
+export interface EndpointTagsRemove {
+  method: "post";
+  input: {
+    query?: EndpointTagsRemove_InputQuery;
+  };
+  output: {
+    NO_CONTENT: EndpointTagsRemove_OutputNO_CONTENT;
+  };
+  media: null;
+}
+export interface EndpointTagsRemove_InputQuery {
+  id: string;
+}
+export interface EndpointTagsUpdate {
+  method: "post";
+  input: {
+    query?: EndpointTagsUpdate_InputQuery;
+    body?: EndpointTagsUpdate_InputBody;
+  };
+  output: {
+    OK: EndpointTagsUpdate_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointTagsUpdate_InputQuery {
+  id: string;
+}
+export interface EndpointTagsUpdate_InputBody {
+  name: string;
+  icon: string;
+  color: string;
+}
+export interface EndpointTagsUpdate_OutputOK {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  container: string;
+}
+export interface EndpointMiscCheckValid {
+  method: "get";
+  input: {
+    query?: EndpointMiscCheckValid_InputQuery;
+  };
+  output: {
+    OK: EndpointMiscCheckValid_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointMiscCheckValid_InputQuery {
+  container: string;
+  path: string;
+}
+export interface EndpointMiscGetOgData {
+  method: "get";
+  input: {
+    query?: EndpointMiscGetOgData_InputQuery;
+  };
+  output: {
+    OK: EndpointMiscGetOgData_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointMiscGetOgData_InputQuery {
+  id: string;
+}
+export interface EndpointMiscGetOgData_OutputOK {
+  ogTitle?: string;
+  ogDescription?: string;
+  ogSiteName?: string;
+  ogImage?: {
+    url: string;
+    width?: number;
+    height?: number;
+    type?: string;
+  }[];
+}
+export interface EndpointMiscGetPath {
+  method: "get";
+  input: {
+    query?: EndpointMiscGetPath_InputQuery;
+  };
+  output: {
+    OK: EndpointMiscGetPath_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointMiscGetPath_InputQuery {
+  container: string;
+  folder?: string;
+}
+export interface EndpointMiscGetPath_OutputOK {
+  container: {
+    id: string;
+    name: string;
+    icon: string;
+    color: string;
+    cover: string;
+    pinned: boolean;
+    hidden: boolean;
+  };
+  route: {
+    id: string;
+    container: string;
+    name: string;
+    color: string;
+    icon: string;
+    parent: string;
+  }[];
+}
+export interface EndpointMiscSearch {
+  method: "get";
+  input: {
+    query?: EndpointMiscSearch_InputQuery;
+  };
+  output: {
+    OK: EndpointMiscSearch_OutputOK;
+  };
+  media: null;
+}
+export interface EndpointMiscSearch_InputQuery {
+  q: string;
+  container: string;
+  tags?: string;
+  folder?: string;
+}
