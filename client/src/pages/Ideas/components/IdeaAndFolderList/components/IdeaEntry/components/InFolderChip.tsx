@@ -17,7 +17,7 @@ function InFolderChip({ entry }: { entry: IdeaBoxIdea }) {
   }
 
   return (
-    <Flex as="span" align="center" gap="sm" mt="sm">
+    <Flex align="center" as="span" gap="sm" mt="sm">
       <Text size="sm">In</Text>
       <TagChip
         color={entry.expand.folder.color}

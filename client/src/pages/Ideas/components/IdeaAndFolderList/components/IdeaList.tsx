@@ -16,11 +16,6 @@ function IdeaList({ data }: { data: IdeaBoxIdea[] }) {
   return (
     <Column
       gap="0.5rem"
-      rootStyles={{
-        flexShrink: 0,
-        marginBottom: '2rem',
-        overflowX: 'visible'
-      }}
       queries={[
         {
           columns: 1,
@@ -43,6 +38,11 @@ function IdeaList({ data }: { data: IdeaBoxIdea[] }) {
           query: 'min-width: 1536px'
         }
       ]}
+      rootStyles={{
+        flexShrink: 0,
+        marginBottom: '2rem',
+        overflowX: 'visible'
+      }}
     >
       {data
         .filter(item => {

@@ -22,8 +22,8 @@ function HamburgerButton({
 
   return (
     <Flex
-      as="button"
       align="center"
+      as="button"
       bg={
         !isSelected
           ? { hover: 'bg-300', darkHover: 'bg-600' }
@@ -44,7 +44,6 @@ function HamburgerButton({
       onClick={handleUpdate}
     >
       <Icon
-        size="1em"
         color={
           !isSelected
             ? { base: 'muted', hover: 'bg-100' }
@@ -55,6 +54,7 @@ function HamburgerButton({
                 : { base: 'bg-100', hover: 'bg-800' }
         }
         icon="tabler:dots-vertical"
+        size="1em"
       />
     </Flex>
   )

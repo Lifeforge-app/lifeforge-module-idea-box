@@ -76,7 +76,7 @@ function Header() {
             size={{ base: '2xl', sm: '3xl' }}
             weight="semibold"
           >
-            <Flex as="h1" align="center" gap="sm">
+            <Flex align="center" as="h1" gap="sm">
               {(() => {
                 if (!pathDetails) {
                   return (
@@ -137,13 +137,13 @@ function Header() {
                                 p="sm"
                               >
                                 <Icon
-                                  size="1.25rem"
                                   icon={folder.icon}
+                                  size="1.25rem"
                                   style={{ color: folder.color }}
                                 />
                                 <Text
-                                  size="base"
                                   display={{ base: 'none', md: 'block' }}
+                                  size="base"
                                 >
                                   {folder.name}
                                 </Text>

@@ -44,7 +44,7 @@ function ModifyContainerModal({
     (type === 'create'
       ? forgeAPI.containers.create
       : forgeAPI.containers.update.input({
-          id: initialData?.id || ''!
+          id: initialData?.id || ''
         })
     ).mutationOptions({
       onSuccess: () => {

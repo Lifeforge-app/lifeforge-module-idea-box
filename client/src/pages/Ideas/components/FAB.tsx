@@ -85,6 +85,7 @@ function FAB() {
         zIndex="9990"
       >
         <Button
+          shadow
           icon="tabler:plus"
           iconProps={{
             style: {
@@ -93,7 +94,6 @@ function FAB() {
             }
           }}
           position="relative"
-          shadow
           zIndex="9991"
           onClick={() => setIsOpen(!isOpen)}
         />
@@ -137,8 +137,8 @@ function FAB() {
                 {t(`entryType.${name.toLowerCase()}`)}
               </Text>
               <Flex
-                as="button"
                 centered
+                as="button"
                 bg={focusedIndex === index ? 'bg-200' : 'bg-100'}
                 p="sm"
                 r="full"

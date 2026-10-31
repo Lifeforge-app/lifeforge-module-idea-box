@@ -68,8 +68,8 @@ function TagItem({
         gap="sm"
         px="sm"
         py="xs"
-        role="button"
         r="full"
+        role="button"
         style={{
           backgroundColor: isSelected ? color : undefined,
           cursor: 'pointer',

@@ -110,16 +110,16 @@ function FolderItem({ folder }: { folder: IdeaBoxFolder }) {
       color={canDrop && isOver ? { base: 'bg-50', dark: 'bg-800' } : undefined}
     >
       <Flex
-        as={Link}
         ref={node => {
           dragRef(node)
           drop(node)
         }}
+        shadow
+        as={Link}
         justify="between"
         p="md"
         position="relative"
         r="md"
-        shadow
         style={{
           ...getStyle({
             isOver,

@@ -11,7 +11,7 @@ function FolderList() {
 
   return (
     <>
-      <Flex as="h2" align="center" gap="sm" mb="sm">
+      <Flex align="center" as="h2" gap="sm" mb="sm">
         <Icon color="muted" icon="tabler:folder" size="1.5rem" />
         <Text color="muted" size="lg" weight="medium">
           {t('entryType.folder')}

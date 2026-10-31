@@ -18,8 +18,8 @@ function Ideas() {
       <Header />
       {!viewArchived && (
         <SearchInput
-          mt="md"
           debounceMs={300}
+          mt="md"
           searchTarget={path === '' ? 'idea' : 'idea In Folder'}
           value={searchQuery}
           onChange={setSearchQuery}

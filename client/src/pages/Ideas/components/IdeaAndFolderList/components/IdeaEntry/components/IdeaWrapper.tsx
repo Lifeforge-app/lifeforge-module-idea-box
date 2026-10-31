@@ -45,8 +45,8 @@ function IdeaWrapper({
         dragRef(node)
       }}
       isInteractive
-      as="button"
       align="start"
+      as="button"
       gap="sm"
       justify="between"
       my="md"
